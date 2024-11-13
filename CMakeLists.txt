@@ -12,7 +12,7 @@ endif()
 project ("Minesweeper")
 
 # Add source to this project's executable.
-add_executable (Minesweeper "Minesweeper.cpp" "Minesweeper.h")
+add_executable (Minesweeper "Minesweeper.cpp" )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Minesweeper PROPERTY CXX_STANDARD 20)
