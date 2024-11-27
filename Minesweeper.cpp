@@ -13,7 +13,25 @@ struct IntVector2
 	}
 };
 
-class Board {
+class Board 
+{
+public:
+
+	enum AnchorPoints 
+	{
+		TOP_LEFT,
+		TOP_MIDDLE,
+		TOP_RIGHT,
+
+		MIDDLE_LEFT,
+		MIDDLE,
+		MIDDLE_RIGHT,
+
+		BOTTOM_LEFT,
+		BOTTOM_MIDDLE,
+		BOTTOM_RIGHT,	
+	};
+
 private:
 	struct m_Tile
 	{
@@ -34,7 +52,7 @@ private:
 		bool isCovered = false;
 		Contents tileContent = EMPTY;
 		IntVector2 dimensions = { 20,20 };
-		int margin = 40;
+		int margin = 10;
 
 		Color colour = RED;
 	};
@@ -42,6 +60,9 @@ private:
 	typedef std::vector<std::vector<m_Tile>> TileGrid;
 
 	TileGrid m_grid;
+
+	AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
+
 
 private:
 	int GenerateRandomNumber(int min, int max) {
@@ -82,16 +103,16 @@ private:
 		return count;
 	}
 	
-	TileGrid GenerateBoard(int rows, int columns)
+	TileGrid GenerateBoard(IntVector2 dimensions)
 	{
 		TileGrid board;
 
 		// Populate board with tiles.
-		for (int rows_index = 0; rows_index < rows; rows_index++)
+		for (int rows_index = 0; rows_index < dimensions.y; rows_index++)
 		{
 			std::vector<m_Tile> row;
 
-			for (int columns_index = 0; columns_index < columns; columns_index++)
+			for (int columns_index = 0; columns_index < dimensions.x; columns_index++)
 			{
 				row.push_back(m_Tile{});
 			}
@@ -103,10 +124,10 @@ private:
 
 		std::vector<IntVector2> bombCoordinates;
 
-		while (bombCoordinates.size() != rows)
+		while (bombCoordinates.size() != dimensions.y)
 		{
 			bool coordExists = false;
-			IntVector2 bombCoordinateToAdd = { generateRandomNumber(0, columns - 1), generateRandomNumber(0, rows - 1) };
+			IntVector2 bombCoordinateToAdd = { GenerateRandomNumber(0, dimensions.x - 1), GenerateRandomNumber(0, dimensions.y - 1) };
 
 			for (IntVector2 bombCoordinate : bombCoordinates) {
 				coordExists = bombCoordinate == bombCoordinateToAdd;
@@ -127,7 +148,7 @@ private:
 		{
 			for (int x = 0; x < board[0].size(); x++)
 			{
-				int numberOfBombs = getNumberOfBombsAroundPoint(board, IntVector2{ x,y });
+				int numberOfBombs = GetNumberOfBombsAroundPoint(board, IntVector2{ x,y });
 
 				if (numberOfBombs == 1) board[y][x].tileContent = m_Tile::Contents::ONE;
 				else if (numberOfBombs == 2) board[y][x].tileContent = m_Tile::Contents::TWO;
@@ -143,26 +164,75 @@ private:
 		return board;
 	}
 
-public:
-	Board(IntVector2 dimensions) {
-		m_grid = GenerateBoard(dimensions.y, dimensions.x);
+	IntVector2 GetBoardPixelDimensions()
+	{
+		IntVector2 dimensions;
+		m_Tile tile = m_grid[0][0];
+
+		dimensions.x = (m_grid[0].size()-1) * (tile.dimensions.x + tile.margin);
+		dimensions.y = (m_grid.size()-1) * (tile.dimensions.y + tile.margin);
+
+		dimensions.x += tile.dimensions.x;
+		dimensions.y += tile.dimensions.y;
+		
+		return dimensions;
 	}
 
-	void DisplayGrid() {
+public:
+	Board(IntVector2 dimensions) {
+		m_grid = GenerateBoard(dimensions);
+	}
 
-		for (int row = 0; row < m_grid.size(); row++) {
-			for (int column = 0; column < m_grid[row].size(); column++) {
-				if (!m_grid[row][column].isCovered) {
-					m_Tile tile = m_grid[row][column];
-					DrawRectangle(column * tile.margin, row * tile.margin, tile.dimensions.x, tile.dimensions.y, RED);
+	void SetAnchorPoint(AnchorPoints anchorPoint) {
+		m_anchorPoint = anchorPoint;
+	}
+
+	void DisplayGrid(IntVector2 position) 
+	{
+		IntVector2 offset = { 0,0 }; // Default for top left anchor point;
+		IntVector2 pixelDimensions = GetBoardPixelDimensions();
+
+		if (m_anchorPoint == TOP_MIDDLE) offset.x = int(pixelDimensions.x / 2);
+		else if (m_anchorPoint == TOP_RIGHT) offset.x = pixelDimensions.x;
+
+		else if (m_anchorPoint == MIDDLE_LEFT) offset.y = int(pixelDimensions.y / 2);
+		else if (m_anchorPoint == MIDDLE) {
+			offset.x = int(pixelDimensions.x / 2);
+			offset.y = int(pixelDimensions.y / 2);
+		}
+		else if (m_anchorPoint == MIDDLE_RIGHT) {
+			offset.x = pixelDimensions.x;
+			offset.y = int(pixelDimensions.y / 2);
+		}
+
+		else if (m_anchorPoint == BOTTOM_LEFT) offset.y = pixelDimensions.y;
+		else if (m_anchorPoint == BOTTOM_MIDDLE)
+		{
+			offset.x = int(pixelDimensions.x / 2);
+			offset.y = pixelDimensions.y;
+		}
+		else if (m_anchorPoint == BOTTOM_RIGHT) {
+			offset.x = pixelDimensions.x;
+			offset.y = pixelDimensions.y;
+		}
+
+
+		for (int row_index = 0; row_index < m_grid.size(); row_index++) 
+		{
+			for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
+			{
+				if (!m_grid[row_index][column_index].isCovered)
+				{
+					m_Tile tile = m_grid[row_index][column_index];
+					int xPos = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
+					int yPos = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
+
+					DrawRectangle(xPos, yPos, tile.dimensions.x, tile.dimensions.y, RED);
 				}
 			}
 		}
 	}
 };
-
-
-
 
 
 int main()
@@ -171,6 +241,7 @@ int main()
 	SetTargetFPS(60);
 
 	Board board(IntVector2{9,9});
+	board.SetAnchorPoint(Board::AnchorPoints::MIDDLE);
 
 	/*for (int y = 0; y < board.size(); y++)
 	{
@@ -187,7 +258,7 @@ int main()
 		BeginDrawing();
 		ClearBackground(PURPLE);
 
-		board.DisplayGrid();
+		board.DisplayGrid(IntVector2{GetScreenWidth()/2,10});
 
 
 		EndDrawing();
