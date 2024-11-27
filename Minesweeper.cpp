@@ -51,7 +51,7 @@ private:
 
 		bool isCovered = false;
 		Contents tileContent = EMPTY;
-		IntVector2 dimensions = { 20,20 };
+		IntVector2 dimensions = { 50,50 };
 		int margin = 10;
 
 		Color colour = RED;
@@ -256,9 +256,9 @@ int main()
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
-		ClearBackground(PURPLE);
+		ClearBackground(RAYWHITE);
 
-		board.DisplayGrid(IntVector2{GetScreenWidth()/2,10});
+		board.DisplayGrid(IntVector2{GetScreenWidth()/2,GetScreenHeight()/2});
 
 
 		EndDrawing();
