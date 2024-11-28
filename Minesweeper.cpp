@@ -32,8 +32,7 @@ public:
 		BOTTOM_RIGHT,	
 	};
 
-private:
-	struct m_Tile
+	struct Tile
 	{
 		enum Contents
 		{
@@ -49,15 +48,21 @@ private:
 			EIGHT = 8
 		};
 
+		IntVector2 dimensions;
+		int margin;
+		Color colour;
+
 		bool isCovered = false;
 		Contents tileContent = EMPTY;
-		IntVector2 dimensions = { 50,50 };
-		int margin = 10;
 
-		Color colour = RED;
+		Tile(IntVector2 dimensions_, int margin_, Color colour_) 
+			: dimensions(dimensions_), margin(margin_), colour(colour_){};
+
 	};
 
-	typedef std::vector<std::vector<m_Tile>> TileGrid;
+private:
+
+	typedef std::vector<std::vector<Tile>> TileGrid;
 
 	TileGrid m_grid;
 
@@ -81,40 +86,40 @@ private:
 	{
 		int count = 0;
 
-		if (point.y - 1 > 0 && point.x - 1 > 0 && board[point.y - 1][point.x - 1].tileContent == m_Tile::Contents::BOMB) count++; // Top Left
+		if (point.y - 1 > 0 && point.x - 1 > 0 && board[point.y - 1][point.x - 1].tileContent == Tile::Contents::BOMB) count++; // Top Left
 
-		if (point.y - 1 > 0 && board[point.y - 1][point.x].tileContent == m_Tile::Contents::BOMB) count++; // Top Middle
+		if (point.y - 1 > 0 && board[point.y - 1][point.x].tileContent == Tile::Contents::BOMB) count++; // Top Middle
 
-		if (point.y - 1 > 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].tileContent == m_Tile::Contents::BOMB) count++; // Top Right
-
-
-		if (point.x - 1 > 0 && board[point.y][point.x - 1].tileContent == m_Tile::Contents::BOMB) count++; // Middle Left
-
-		if (point.x + 1 < board[point.y].size() && board[point.y][point.x + 1].tileContent == m_Tile::Contents::BOMB) count++; // Middle Right
+		if (point.y - 1 > 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].tileContent == Tile::Contents::BOMB) count++; // Top Right
 
 
-		if (point.y + 1 < board.size() && point.x - 1 > 0 && board[point.y + 1][point.x - 1].tileContent == m_Tile::Contents::BOMB) count++; // Bottem Left
+		if (point.x - 1 > 0 && board[point.y][point.x - 1].tileContent == Tile::Contents::BOMB) count++; // Middle Left
 
-		if (point.y + 1 < board.size() && board[point.y + 1][point.x].tileContent == m_Tile::Contents::BOMB) count++; // Bottem Middle
+		if (point.x + 1 < board[point.y].size() && board[point.y][point.x + 1].tileContent == Tile::Contents::BOMB) count++; // Middle Right
 
-		if (point.y + 1 < board.size() && point.x + 1 < board[point.y].size() && board[point.y + 1][point.x + 1].tileContent == m_Tile::Contents::BOMB) count++; // Bottem Right
+
+		if (point.y + 1 < board.size() && point.x - 1 > 0 && board[point.y + 1][point.x - 1].tileContent == Tile::Contents::BOMB) count++; // Bottem Left
+
+		if (point.y + 1 < board.size() && board[point.y + 1][point.x].tileContent == Tile::Contents::BOMB) count++; // Bottem Middle
+
+		if (point.y + 1 < board.size() && point.x + 1 < board[point.y].size() && board[point.y + 1][point.x + 1].tileContent == Tile::Contents::BOMB) count++; // Bottem Right
 
 
 		return count;
 	}
 	
-	TileGrid GenerateBoard(IntVector2 dimensions)
+	TileGrid GenerateBoard(IntVector2 dimensions, Tile sampleTile)
 	{
 		TileGrid board;
 
 		// Populate board with tiles.
 		for (int rows_index = 0; rows_index < dimensions.y; rows_index++)
 		{
-			std::vector<m_Tile> row;
+			std::vector<Tile> row;
 
 			for (int columns_index = 0; columns_index < dimensions.x; columns_index++)
 			{
-				row.push_back(m_Tile{});
+				row.push_back(sampleTile);
 			}
 
 			board.push_back(row);
@@ -139,7 +144,7 @@ private:
 
 		for (IntVector2 coordinates : bombCoordinates)
 		{
-			board[coordinates.y][coordinates.x].tileContent = m_Tile::Contents::BOMB;
+			board[coordinates.y][coordinates.x].tileContent = Tile::Contents::BOMB;
 		}
 
 
@@ -150,14 +155,14 @@ private:
 			{
 				int numberOfBombs = GetNumberOfBombsAroundPoint(board, IntVector2{ x,y });
 
-				if (numberOfBombs == 1) board[y][x].tileContent = m_Tile::Contents::ONE;
-				else if (numberOfBombs == 2) board[y][x].tileContent = m_Tile::Contents::TWO;
-				else if (numberOfBombs == 3) board[y][x].tileContent = m_Tile::Contents::THREE;
-				else if (numberOfBombs == 4) board[y][x].tileContent = m_Tile::Contents::FOUR;
-				else if (numberOfBombs == 5) board[y][x].tileContent = m_Tile::Contents::FIVE;
-				else if (numberOfBombs == 6) board[y][x].tileContent = m_Tile::Contents::SIX;
-				else if (numberOfBombs == 7) board[y][x].tileContent = m_Tile::Contents::SEVEN;
-				else if (numberOfBombs == 8) board[y][x].tileContent = m_Tile::Contents::EIGHT;
+				if (numberOfBombs == 1) board[y][x].tileContent = Tile::Contents::ONE;
+				else if (numberOfBombs == 2) board[y][x].tileContent = Tile::Contents::TWO;
+				else if (numberOfBombs == 3) board[y][x].tileContent = Tile::Contents::THREE;
+				else if (numberOfBombs == 4) board[y][x].tileContent = Tile::Contents::FOUR;
+				else if (numberOfBombs == 5) board[y][x].tileContent = Tile::Contents::FIVE;
+				else if (numberOfBombs == 6) board[y][x].tileContent = Tile::Contents::SIX;
+				else if (numberOfBombs == 7) board[y][x].tileContent = Tile::Contents::SEVEN;
+				else if (numberOfBombs == 8) board[y][x].tileContent = Tile::Contents::EIGHT;
 			}
 		}
 
@@ -167,7 +172,7 @@ private:
 	IntVector2 GetBoardPixelDimensions()
 	{
 		IntVector2 dimensions;
-		m_Tile tile = m_grid[0][0];
+		Tile tile = m_grid[0][0];
 
 		dimensions.x = (m_grid[0].size()-1) * (tile.dimensions.x + tile.margin);
 		dimensions.y = (m_grid.size()-1) * (tile.dimensions.y + tile.margin);
@@ -179,8 +184,8 @@ private:
 	}
 
 public:
-	Board(IntVector2 dimensions) {
-		m_grid = GenerateBoard(dimensions);
+	Board(IntVector2 dimensions, Tile sampleTile) {
+		m_grid = GenerateBoard(dimensions, sampleTile);
 	}
 
 	void SetAnchorPoint(AnchorPoints anchorPoint) {
@@ -223,11 +228,11 @@ public:
 			{
 				if (!m_grid[row_index][column_index].isCovered)
 				{
-					m_Tile tile = m_grid[row_index][column_index];
+					Tile tile = m_grid[row_index][column_index];
 					int xPos = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
 					int yPos = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
 
-					DrawRectangle(xPos, yPos, tile.dimensions.x, tile.dimensions.y, RED);
+					DrawRectangle(xPos, yPos, tile.dimensions.x, tile.dimensions.y, tile.colour);
 				}
 			}
 		}
@@ -240,7 +245,9 @@ int main()
 	InitWindow(800, 600, "Minesweeper");
 	SetTargetFPS(60);
 
-	Board board(IntVector2{9,9});
+	Board::Tile sampleTile({ 40,40 }, 10, RED);
+
+	Board board(IntVector2{ 9,9 }, sampleTile);
 	board.SetAnchorPoint(Board::AnchorPoints::MIDDLE);
 
 	/*for (int y = 0; y < board.size(); y++)
