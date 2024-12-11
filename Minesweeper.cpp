@@ -32,44 +32,24 @@ public:
 		BOTTOM_RIGHT,	
 	};
 
-	struct Tile
+	struct Square
 	{
-		enum Contents
-		{
-			BOMB = -1,
-			EMPTY = 0,
-			ONE = 1,
-			TWO = 2,
-			THREE = 3,
-			FOUR = 4,
-			FIVE = 5,
-			SIX = 6,
-			SEVEN = 7,
-			EIGHT = 8
-		};
-
 		IntVector2 dimensions;
 		int margin;
 		Color colour;
-
-		bool isCovered = false;
-		Contents tileContent = EMPTY;
-
-		Tile(IntVector2 dimensions_, int margin_, Color colour_) 
+		
+		Square(IntVector2 dimensions_, int margin_, Color colour_) 
 			: dimensions(dimensions_), margin(margin_), colour(colour_){};
 
 	};
 
-private:
+protected:
 
-	typedef std::vector<std::vector<Tile>> TileGrid;
-
-	TileGrid m_grid;
-
+	typedef std::vector<std::vector<Square>> SquareGrid;
+	SquareGrid m_grid;
 	AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
-
-private:
+protected:
 	int GenerateRandomNumber(int min, int max) {
 		// Create a random device and a Mersenne Twister random number generator
 		std::random_device rd;
@@ -82,88 +62,22 @@ private:
 		return dis(gen);
 	}
 
-	int GetNumberOfBombsAroundPoint(TileGrid board, IntVector2 point)
+	template <typename T_Grid, typename T_Square> 
+	T_Grid GenerateBoard(IntVector2 dimensions,T_Square sampleSquare)
 	{
-		int count = 0;
-
-		if (point.y - 1 > 0 && point.x - 1 > 0 && board[point.y - 1][point.x - 1].tileContent == Tile::Contents::BOMB) count++; // Top Left
-
-		if (point.y - 1 > 0 && board[point.y - 1][point.x].tileContent == Tile::Contents::BOMB) count++; // Top Middle
-
-		if (point.y - 1 > 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].tileContent == Tile::Contents::BOMB) count++; // Top Right
-
-
-		if (point.x - 1 > 0 && board[point.y][point.x - 1].tileContent == Tile::Contents::BOMB) count++; // Middle Left
-
-		if (point.x + 1 < board[point.y].size() && board[point.y][point.x + 1].tileContent == Tile::Contents::BOMB) count++; // Middle Right
-
-
-		if (point.y + 1 < board.size() && point.x - 1 > 0 && board[point.y + 1][point.x - 1].tileContent == Tile::Contents::BOMB) count++; // Bottem Left
-
-		if (point.y + 1 < board.size() && board[point.y + 1][point.x].tileContent == Tile::Contents::BOMB) count++; // Bottem Middle
-
-		if (point.y + 1 < board.size() && point.x + 1 < board[point.y].size() && board[point.y + 1][point.x + 1].tileContent == Tile::Contents::BOMB) count++; // Bottem Right
-
-
-		return count;
-	}
-	
-	TileGrid GenerateBoard(IntVector2 dimensions, Tile sampleTile)
-	{
-		TileGrid board;
+		T_Grid board;
 
 		// Populate board with tiles.
 		for (int rows_index = 0; rows_index < dimensions.y; rows_index++)
 		{
-			std::vector<Tile> row;
+			std::vector<T_Square> row;
 
 			for (int columns_index = 0; columns_index < dimensions.x; columns_index++)
 			{
-				row.push_back(sampleTile);
+				row.push_back(sampleSquare);
 			}
 
 			board.push_back(row);
-		}
-
-		// Place bombs on board.
-
-		std::vector<IntVector2> bombCoordinates;
-
-		while (bombCoordinates.size() != dimensions.y)
-		{
-			bool coordExists = false;
-			IntVector2 bombCoordinateToAdd = { GenerateRandomNumber(0, dimensions.x - 1), GenerateRandomNumber(0, dimensions.y - 1) };
-
-			for (IntVector2 bombCoordinate : bombCoordinates) {
-				coordExists = bombCoordinate == bombCoordinateToAdd;
-				if (coordExists) break;
-			}
-
-			if (!coordExists) bombCoordinates.push_back(bombCoordinateToAdd);
-		}
-
-		for (IntVector2 coordinates : bombCoordinates)
-		{
-			board[coordinates.y][coordinates.x].tileContent = Tile::Contents::BOMB;
-		}
-
-
-		// Place numbers
-		for (int y = 0; y < board.size(); y++)
-		{
-			for (int x = 0; x < board[0].size(); x++)
-			{
-				int numberOfBombs = GetNumberOfBombsAroundPoint(board, IntVector2{ x,y });
-
-				if (numberOfBombs == 1) board[y][x].tileContent = Tile::Contents::ONE;
-				else if (numberOfBombs == 2) board[y][x].tileContent = Tile::Contents::TWO;
-				else if (numberOfBombs == 3) board[y][x].tileContent = Tile::Contents::THREE;
-				else if (numberOfBombs == 4) board[y][x].tileContent = Tile::Contents::FOUR;
-				else if (numberOfBombs == 5) board[y][x].tileContent = Tile::Contents::FIVE;
-				else if (numberOfBombs == 6) board[y][x].tileContent = Tile::Contents::SIX;
-				else if (numberOfBombs == 7) board[y][x].tileContent = Tile::Contents::SEVEN;
-				else if (numberOfBombs == 8) board[y][x].tileContent = Tile::Contents::EIGHT;
-			}
 		}
 
 		return board;
@@ -172,7 +86,7 @@ private:
 	IntVector2 GetBoardPixelDimensions()
 	{
 		IntVector2 dimensions;
-		Tile tile = m_grid[0][0];
+		Square tile = m_grid[0][0];
 
 		dimensions.x = (m_grid[0].size()-1) * (tile.dimensions.x + tile.margin);
 		dimensions.y = (m_grid.size()-1) * (tile.dimensions.y + tile.margin);
@@ -183,16 +97,21 @@ private:
 		return dimensions;
 	}
 
+	virtual bool ShouldRenderSquare(IntVector2 coords)
+	{
+		return true;
+	}
+
 public:
-	Board(IntVector2 dimensions, Tile sampleTile) {
-		m_grid = GenerateBoard(dimensions, sampleTile);
+	Board(IntVector2 dimensions, Square sampleSquare) {
+		m_grid = GenerateBoard<SquareGrid, Square>(dimensions, sampleSquare);
 	}
 
 	void SetAnchorPoint(AnchorPoints anchorPoint) {
 		m_anchorPoint = anchorPoint;
 	}
 
-	void DisplayGrid(IntVector2 position) 
+	void DisplayGrid(IntVector2 position)
 	{
 		IntVector2 offset = { 0,0 }; // Default for top left anchor point;
 		IntVector2 pixelDimensions = GetBoardPixelDimensions();
@@ -221,14 +140,13 @@ public:
 			offset.y = pixelDimensions.y;
 		}
 
-
-		for (int row_index = 0; row_index < m_grid.size(); row_index++) 
+		for (int row_index = 0; row_index < m_grid.size(); row_index++)
 		{
 			for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
 			{
-				if (!m_grid[row_index][column_index].isCovered)
+				if (ShouldRenderSquare(IntVector2{column_index, row_index}))
 				{
-					Tile tile = m_grid[row_index][column_index];
+					Square tile = m_grid[row_index][column_index];
 					int xPos = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
 					int yPos = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
 
@@ -239,26 +157,128 @@ public:
 	}
 };
 
+class Minesweeper : public Board {
+
+private:
+	enum class Contents : int
+	{
+		BOMB = -1,
+		EMPTY = 0,
+		ONE = 1,
+		TWO = 2,
+		THREE = 3,
+		FOUR = 4,
+		FIVE = 5,
+		SIX = 6,
+		SEVEN = 7,
+		EIGHT = 8
+	};
+
+	struct Tile : Square
+	{
+		Contents tileContent = Contents::EMPTY;
+		bool isCovered = false;
+
+		Tile(const Board::Square& square)
+			: Square(square), tileContent(Contents::EMPTY), isCovered(false) {
+		}
+	};
+	
+	typedef std::vector<std::vector<Tile>> TileGrid;
+
+	TileGrid m_grid;
+
+private:
+	int GetNumberOfBombsAroundPoint(TileGrid board, IntVector2 point)
+	{
+		int count = 0;
+
+		if (point.y - 1 > 0 && point.x - 1 > 0 && board[point.y - 1][point.x - 1].tileContent == Contents::BOMB) count++; // Top Left
+
+		if (point.y - 1 > 0 && board[point.y - 1][point.x].tileContent == Contents::BOMB) count++; // Top Middle
+
+		if (point.y - 1 > 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].tileContent == Contents::BOMB) count++; // Top Right
+
+
+		if (point.x - 1 > 0 && board[point.y][point.x - 1].tileContent == Contents::BOMB) count++; // Middle Left
+
+		if (point.x + 1 < board[point.y].size() && board[point.y][point.x + 1].tileContent == Contents::BOMB) count++; // Middle Right
+
+
+		if (point.y + 1 < board.size() && point.x - 1 > 0 && board[point.y + 1][point.x - 1].tileContent == Contents::BOMB) count++; // Bottem Left
+
+		if (point.y + 1 < board.size() && board[point.y + 1][point.x].tileContent == Contents::BOMB) count++; // Bottem Middle
+
+		if (point.y + 1 < board.size() && point.x + 1 < board[point.y].size() && board[point.y + 1][point.x + 1].tileContent == Contents::BOMB) count++; // Bottem Right
+
+
+		return count;
+	}
+
+	void PlaceBombsOnBoard(TileGrid board) {
+		// Place bombs on board.
+
+		std::vector<IntVector2> bombCoordinates;
+
+		while (bombCoordinates.size() != board.size())
+		{
+			bool coordExists = false;
+			IntVector2 bombCoordinateToAdd = { GenerateRandomNumber(0, board[0].size() - 1), GenerateRandomNumber(0, board.size() - 1)};
+
+			for (IntVector2 bombCoordinate : bombCoordinates) {
+				coordExists = bombCoordinate == bombCoordinateToAdd;
+				if (coordExists) break;
+			}
+
+			if (!coordExists) bombCoordinates.push_back(bombCoordinateToAdd);
+		}
+
+		for (IntVector2 coordinates : bombCoordinates)
+		{
+			board[coordinates.y][coordinates.x].tileContent = Contents::BOMB;
+		}
+
+
+		// Place numbers
+		for (int y = 0; y < board.size(); y++)
+		{
+			for (int x = 0; x < board[0].size(); x++)
+			{
+				int numberOfBombs = GetNumberOfBombsAroundPoint(board, IntVector2{ x,y });
+
+				if (numberOfBombs == 1) board[y][x].tileContent = Contents::ONE;
+				else if (numberOfBombs == 2) board[y][x].tileContent = Contents::TWO;
+				else if (numberOfBombs == 3) board[y][x].tileContent = Contents::THREE;
+				else if (numberOfBombs == 4) board[y][x].tileContent = Contents::FOUR;
+				else if (numberOfBombs == 5) board[y][x].tileContent = Contents::FIVE;
+				else if (numberOfBombs == 6) board[y][x].tileContent = Contents::SIX;
+				else if (numberOfBombs == 7) board[y][x].tileContent = Contents::SEVEN;
+				else if (numberOfBombs == 8) board[y][x].tileContent = Contents::EIGHT;
+			}
+		}
+	}
+
+	bool ShouldRenderSquare(IntVector2 coords) override
+	{
+		return !m_grid[coords.y][coords.x].isCovered;
+	}
+
+public:
+	Minesweeper(IntVector2 dimensions, Board::Square sampleTile) : Board(dimensions, sampleTile)
+	{
+		m_grid = GenerateBoard<TileGrid, Tile>(IntVector2{ 9,9 }, sampleTile);
+	} 
+};
 
 int main()
 {
 	InitWindow(800, 600, "Minesweeper");
 	SetTargetFPS(60);
 
-	Board::Tile sampleTile({ 40,40 }, 10, RED);
+	Board::Square sampleTile({ 40,40 }, 10, RED);
 
-	Board board(IntVector2{ 9,9 }, sampleTile);
+	Minesweeper board(IntVector2{ 9,9 }, sampleTile);
 	board.SetAnchorPoint(Board::AnchorPoints::MIDDLE);
-
-	/*for (int y = 0; y < board.size(); y++)
-	{
-		for (int x = 0; x < board[y].size(); x++)
-		{
-			std::cout << board[y][x].tileContent;
-		}
-
-		std::cout << "\n";
-	}*/
 
 	while (!WindowShouldClose())
 	{
