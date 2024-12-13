@@ -2,6 +2,7 @@
 #include "GameBoard.h"
 #include <vector>
 #include <random>
+#include <set>
 
 class Minesweeper : public GameBoard
 {
@@ -61,27 +62,19 @@ private:
 	}
 
 	void PlaceBombsOnBoard(TileGrid &board) {
-		// Place bombs on board.
 
-		std::vector<IntVector2> bombCoordinates;
+		// Place bombs on board.
+		std::set<std::pair<int, int>> bombCoordinates;
 		const int numberOfBombs = 10;
 
-		while (bombCoordinates.size() < numberOfBombs)
-		{
-			bool coordExists = false;
-			IntVector2 bombCoordinateToAdd = { GenerateRandomInteger(0, board[0].size() - 1), GenerateRandomInteger(0, board.size() - 1)};
-
-			for (IntVector2 bombCoordinate : bombCoordinates) {
-				coordExists = bombCoordinate == bombCoordinateToAdd;
-				if (coordExists) break;
-			}
-
-			if (!coordExists) bombCoordinates.push_back(bombCoordinateToAdd);
+		while (bombCoordinates.size() < numberOfBombs) {
+			int x = GenerateRandomInteger(0, board[0].size() - 1);
+			int y = GenerateRandomInteger(0, board.size() - 1);
+			bombCoordinates.insert({ x, y });
 		}
 
-		for (IntVector2 coordinates : bombCoordinates)
-		{
-			board[coordinates.y][coordinates.x].tileContent = Contents::BOMB;
+		for (const auto& [x, y] : bombCoordinates) {
+			board[y][x].tileContent = Contents::BOMB;
 		}
 
 
@@ -112,7 +105,7 @@ private:
 public:
 	Minesweeper(IntVector2 dimensions, GameBoard::Square sampleTile) : GameBoard(dimensions, sampleTile)
 	{
-		m_grid = GenerateBoard<TileGrid, Tile>(IntVector2{ 9,9 }, sampleTile);
+		m_grid = GenerateBoard<TileGrid, Tile>(dimensions, sampleTile);
 	} 
 };
 
