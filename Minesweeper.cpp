@@ -38,19 +38,19 @@ private:
 	{
 		int count = 0;
 
-		if (point.y - 1 > 0 && point.x - 1 > 0 && board[point.y - 1][point.x - 1].tileContent == Contents::BOMB) count++; // Top Left
+		if (point.y - 1 >= 0 && point.x - 1 >= 0 && board[point.y - 1][point.x - 1].tileContent == Contents::BOMB) count++; // Top Left
 
-		if (point.y - 1 > 0 && board[point.y - 1][point.x].tileContent == Contents::BOMB) count++; // Top Middle
+		if (point.y - 1 >= 0 && board[point.y - 1][point.x].tileContent == Contents::BOMB) count++; // Top Middle
 
-		if (point.y - 1 > 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].tileContent == Contents::BOMB) count++; // Top Right
+		if (point.y - 1 >= 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].tileContent == Contents::BOMB) count++; // Top Right
 
 
-		if (point.x - 1 > 0 && board[point.y][point.x - 1].tileContent == Contents::BOMB) count++; // Middle Left
+		if (point.x - 1 >= 0 && board[point.y][point.x - 1].tileContent == Contents::BOMB) count++; // Middle Left
 
 		if (point.x + 1 < board[point.y].size() && board[point.y][point.x + 1].tileContent == Contents::BOMB) count++; // Middle Right
 
 
-		if (point.y + 1 < board.size() && point.x - 1 > 0 && board[point.y + 1][point.x - 1].tileContent == Contents::BOMB) count++; // Bottem Left
+		if (point.y + 1 < board.size() && point.x - 1 >= 0 && board[point.y + 1][point.x - 1].tileContent == Contents::BOMB) count++; // Bottem Left
 
 		if (point.y + 1 < board.size() && board[point.y + 1][point.x].tileContent == Contents::BOMB) count++; // Bottem Middle
 
