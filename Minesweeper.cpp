@@ -23,10 +23,10 @@ class Minesweeper : public GameBoard
 	struct Tile : Square
 	{
 		Contents tileContent = Contents::EMPTY;
-		bool isCovered = false;
+		bool isCovered = true;
 
 		Tile(const GameBoard::Square& square)
-			: Square(square), tileContent(Contents::EMPTY), isCovered(false) {
+			: Square(square), tileContent(Contents::EMPTY), isCovered(true) {
 		}
 	};
 	
