@@ -70,6 +70,10 @@ protected:
 	{
 		static_assert(std::is_base_of<Square, T_Square>::value, "T_Square must derive from Grid::Square");
 
+		if (dimensions.x <= 0 || dimensions.y <= 0) {
+			throw std::invalid_argument("Board dimensions must be positive");
+		}
+
 		T_Grid board;
 
 		// Populate board with tiles.
