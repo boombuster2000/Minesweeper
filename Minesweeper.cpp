@@ -3,9 +3,8 @@
 #include <vector>
 #include <random>
 
-class Minesweeper : public GameBoard {
-
-private:
+class Minesweeper : public GameBoard
+{
 	enum class Contents : int
 	{
 		BOMB = -1,
@@ -61,12 +60,13 @@ private:
 		return count;
 	}
 
-	void PlaceBombsOnBoard(TileGrid board) {
+	void PlaceBombsOnBoard(TileGrid &board) {
 		// Place bombs on board.
 
 		std::vector<IntVector2> bombCoordinates;
+		const int numberOfBombs = 10;
 
-		while (bombCoordinates.size() != board.size())
+		while (bombCoordinates.size() < numberOfBombs)
 		{
 			bool coordExists = false;
 			IntVector2 bombCoordinateToAdd = { GenerateRandomInteger(0, board[0].size() - 1), GenerateRandomInteger(0, board.size() - 1)};

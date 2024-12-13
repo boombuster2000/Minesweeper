@@ -2,6 +2,7 @@
 #include <vector>
 #include <raylib.h>
 #include <random>
+#include <type_traits>
 
 struct IntVector2
 {
@@ -16,8 +17,20 @@ struct IntVector2
 class GameBoard
 {
 public:
+	static struct Square
+	{
+		IntVector2 dimensions;
+		int margin;
+		Color colour;
 
-	enum AnchorPoints
+		Square(IntVector2 dimensions_, int margin_, Color colour_)
+			: dimensions(dimensions_), margin(margin_), colour(colour_)
+		{
+		};
+
+	};
+
+	static enum AnchorPoints
 	{
 		TOP_LEFT,
 		TOP_MIDDLE,
@@ -32,23 +45,12 @@ public:
 		BOTTOM_RIGHT,
 	};
 
-	struct Square
-	{
-		IntVector2 dimensions;
-		int margin;
-		Color colour;
-
-		Square(IntVector2 dimensions_, int margin_, Color colour_)
-			: dimensions(dimensions_), margin(margin_), colour(colour_) {
-		};
-
-	};
-
 protected:
+
+	AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
 	typedef std::vector<std::vector<Square>> SquareGrid;
 	SquareGrid m_grid;
-	AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
 protected:
 	int GenerateRandomInteger(int min, int max) {
@@ -63,9 +65,11 @@ protected:
 		return dis(gen);
 	}
 
-	template <typename T_Grid, typename T_Square>
+	template <typename T_Grid = SquareGrid, typename T_Square = Square>
 	T_Grid GenerateBoard(IntVector2 dimensions, T_Square sampleSquare)
 	{
+		static_assert(std::is_base_of<Square, T_Square>::value, "T_Square must derive from Grid::Square");
+
 		T_Grid board;
 
 		// Populate board with tiles.
@@ -104,8 +108,8 @@ protected:
 	}
 
 public:
-	GameBoard(IntVector2 dimensions, Square sampleSquare) {
-		m_grid = GenerateBoard<SquareGrid, Square>(dimensions, sampleSquare);
+	GameBoard(IntVector2 dimensions, Square sampleSquare):m_grid(GenerateBoard(dimensions, sampleSquare))
+	{
 	}
 
 	void SetAnchorPoint(AnchorPoints anchorPoint) {
