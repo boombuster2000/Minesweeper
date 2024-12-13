@@ -94,6 +94,10 @@ protected:
 
 	IntVector2 GetBoardPixelDimensions()
 	{
+		if (m_grid.empty() || m_grid[0].empty()) {
+			throw std::runtime_error("Empty grid");
+		}
+
 		IntVector2 dimensions;
 		Square tile = m_grid[0][0];
 
