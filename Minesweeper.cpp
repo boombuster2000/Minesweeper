@@ -61,45 +61,31 @@ private:
 		return count;
 	}
 
-	void PlaceBombsOnBoard(TileGrid &board) {
+	void PlaceBombsOnBoard(TileGrid& board) {
+		const float BOMB_DENSITY = 0.15f; // 15% of tiles are bombs
+		const int numberOfBombs = static_cast<int>(board.size() * board[0].size() * BOMB_DENSITY);
 
-		// Place bombs on board.
 		std::set<std::pair<int, int>> bombCoordinates;
-		const int numberOfBombs = 10;
-
 		while (bombCoordinates.size() < numberOfBombs) {
-			int x = GenerateRandomInteger(0, board[0].size() - 1);
-			int y = GenerateRandomInteger(0, board.size() - 1);
-			bombCoordinates.insert({ x, y });
+			bombCoordinates.insert({
+				GenerateRandomInteger(0, board[0].size() - 1),
+				GenerateRandomInteger(0, board.size() - 1)
+				});
 		}
 
 		for (const auto& [x, y] : bombCoordinates) {
 			board[y][x].tileContent = Contents::BOMB;
 		}
 
-
-		// Place numbers
-		for (int y = 0; y < board.size(); y++)
-		{
-			for (int x = 0; x < board[0].size(); x++)
-			{
-				int numberOfBombs = GetNumberOfBombsAroundPoint(board, IntVector2{ x,y });
-
-				if (numberOfBombs == 1) board[y][x].tileContent = Contents::ONE;
-				else if (numberOfBombs == 2) board[y][x].tileContent = Contents::TWO;
-				else if (numberOfBombs == 3) board[y][x].tileContent = Contents::THREE;
-				else if (numberOfBombs == 4) board[y][x].tileContent = Contents::FOUR;
-				else if (numberOfBombs == 5) board[y][x].tileContent = Contents::FIVE;
-				else if (numberOfBombs == 6) board[y][x].tileContent = Contents::SIX;
-				else if (numberOfBombs == 7) board[y][x].tileContent = Contents::SEVEN;
-				else if (numberOfBombs == 8) board[y][x].tileContent = Contents::EIGHT;
+		// Simplified number assignment
+		for (int y = 0; y < board.size(); y++) {
+			for (int x = 0; x < board[0].size(); x++) {
+				if (board[y][x].tileContent != Contents::BOMB) {
+					int bombCount = GetNumberOfBombsAroundPoint(board, IntVector2{ x,y });
+					board[y][x].tileContent = static_cast<Contents>(bombCount);
+				}
 			}
 		}
-	}
-
-	bool ShouldRenderSquare(IntVector2 coords) override
-	{
-		return !m_grid[coords.y][coords.x].isCovered;
 	}
 
 public:
