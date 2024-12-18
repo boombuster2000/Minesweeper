@@ -17,10 +17,10 @@ struct IntVector2
 class GameBoard
 {
 public:
-	static struct Square
+	struct Square
 	{
 		IntVector2 dimensions;
-		IntVector2 positionOnScreen;
+		IntVector2 positionOnScreen = { 0,0 };
 		int margin;
 		Color colour;
 
@@ -31,7 +31,7 @@ public:
 
 	};
 
-	static enum AnchorPoints
+	enum AnchorPoints
 	{
 		TOP_LEFT,
 		TOP_MIDDLE,
@@ -117,8 +117,11 @@ protected:
 	}
 
 public:
-	GameBoard(IntVector2 dimensions, Square sampleSquare):m_grid(GenerateBoard(dimensions, sampleSquare))
+	GameBoard(IntVector2 dimensions, Square sampleSquare, AnchorPoints anchorPoint, IntVector2 position)
 	{
+		m_grid = GenerateBoard(dimensions, sampleSquare);
+		SetAnchorPoint(anchorPoint);
+		SetPositionsOnScreen(position);
 	}
 
 	void SetAnchorPoint(AnchorPoints anchorPoint) {
@@ -175,17 +178,17 @@ public:
 		}
 	}
 
-	void DisplayGrid(IntVector2 position)
+	void DisplayGrid()
 	{
-		SetPositionsOnScreen(position);
 
 		for (int row_index = 0; row_index < m_grid.size(); row_index++)
 		{
 			for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
 			{
+				Square tile = m_grid[row_index][column_index];
+
 				if (ShouldRenderSquare(IntVector2{ column_index, row_index }))
 				{
-					Square tile = m_grid[row_index][column_index];
 					DrawRectangle(tile.positionOnScreen.x, tile.positionOnScreen.y, tile.dimensions.x, tile.dimensions.y, tile.colour);
 				}
 			}
