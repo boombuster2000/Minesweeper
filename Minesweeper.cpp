@@ -108,7 +108,11 @@ int main()
 
 	GameBoard::Square sampleTile({ 40,40 }, 10, RED);
 
-	Minesweeper board(IntVector2{ 9,9 }, sampleTile, GameBoard::AnchorPoints::MIDDLE, IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 });
+	Minesweeper board(
+		IntVector2{ 9,9 }, 
+		sampleTile, GameBoard::AnchorPoints::MIDDLE,
+		IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
+	);
 
 	while (!WindowShouldClose())
 	{
