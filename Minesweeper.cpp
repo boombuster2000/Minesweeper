@@ -110,10 +110,15 @@ public:
 				for (int x = 0; x < m_grid[y].size(); x++)
 				{
 					Tile tile = m_grid[y][x];
-					if (tile.positionOnScreen.x - tile.dimensions.x < mousePosition.x && tile.positionOnScreen.x + tile.dimensions.x > mousePosition.x
-						&& tile.positionOnScreen.y - tile.dimensions.y < mousePosition.y && tile.positionOnScreen.y + tile.dimensions.y > mousePosition.y)
+
+
+					if (tile.positionOnScreen.x < mousePosition.x 
+						&& tile.positionOnScreen.x + tile.dimensions.x > mousePosition.x
+						&& tile.positionOnScreen.y < mousePosition.y 
+						&& tile.positionOnScreen.y + tile.dimensions.y > mousePosition.y)
 					{
-						tile.colour = PURPLE;
+						m_grid[y][x].colour = PURPLE;
+						
 					}
 				}
 			}
