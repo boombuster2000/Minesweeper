@@ -111,14 +111,13 @@ public:
 				{
 					Tile tile = m_grid[y][x];
 
-
 					if (tile.positionOnScreen.x < mousePosition.x 
 						&& tile.positionOnScreen.x + tile.dimensions.x > mousePosition.x
 						&& tile.positionOnScreen.y < mousePosition.y 
 						&& tile.positionOnScreen.y + tile.dimensions.y > mousePosition.y)
 					{
 						m_grid[y][x].colour = PURPLE;
-						
+						break;
 					}
 				}
 			}
