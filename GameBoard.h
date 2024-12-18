@@ -20,6 +20,7 @@ public:
 	static struct Square
 	{
 		IntVector2 dimensions;
+		IntVector2 positionOnScreen;
 		int margin;
 		Color colour;
 
@@ -124,7 +125,8 @@ public:
 		m_anchorPoint = anchorPoint;
 	}
 
-	void DisplayGrid(IntVector2 position)
+	void SetPositionsOnScreen(IntVector2 position)
+	// Function adds position of each square on the screen to it's attributes so other methods can access it.
 	{
 		IntVector2 offset = { 0,0 }; // Default for top left anchor point;
 		IntVector2 pixelDimensions = GetBoardPixelDimensions();
@@ -135,32 +137,47 @@ public:
 		case TOP_RIGHT: offset.x = pixelDimensions.x; break;
 		case MIDDLE_LEFT: offset.y = int(pixelDimensions.y / 2); break;
 
-		case MIDDLE: 
-			offset.x = int(pixelDimensions.x / 2); 
-			offset.y = int(pixelDimensions.y / 2); 
+		case MIDDLE:
+			offset.x = int(pixelDimensions.x / 2);
+			offset.y = int(pixelDimensions.y / 2);
 			break;
 
-		case MIDDLE_RIGHT: 
+		case MIDDLE_RIGHT:
 			offset.x = pixelDimensions.x;
 			offset.y = int(pixelDimensions.y / 2);
 			break;
 
-		case BOTTOM_LEFT: 
+		case BOTTOM_LEFT:
 			offset.y = pixelDimensions.y; break;
 
 		case BOTTOM_MIDDLE:
-			offset.x = int(pixelDimensions.x / 2); 
-			offset.y = pixelDimensions.y; 
+			offset.x = int(pixelDimensions.x / 2);
+			offset.y = pixelDimensions.y;
 			break;
 
 		case BOTTOM_RIGHT:
-			offset.x = pixelDimensions.x; 
-			offset.y = pixelDimensions.y; 
+			offset.x = pixelDimensions.x;
+			offset.y = pixelDimensions.y;
 			break;
 
-		default: 
+		default:
 			break;
 		}
+
+		for (int row_index = 0; row_index < m_grid.size(); row_index++)
+		{
+			for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
+			{
+				Square tile = m_grid[row_index][column_index];
+				m_grid[row_index][column_index].positionOnScreen.x = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
+				m_grid[row_index][column_index].positionOnScreen.y = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
+			}
+		}
+	}
+
+	void DisplayGrid(IntVector2 position)
+	{
+		SetPositionsOnScreen(position);
 
 		for (int row_index = 0; row_index < m_grid.size(); row_index++)
 		{
@@ -169,10 +186,7 @@ public:
 				if (ShouldRenderSquare(IntVector2{ column_index, row_index }))
 				{
 					Square tile = m_grid[row_index][column_index];
-					int xPos = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
-					int yPos = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
-
-					DrawRectangle(xPos, yPos, tile.dimensions.x, tile.dimensions.y, tile.colour);
+					DrawRectangle(tile.positionOnScreen.x, tile.positionOnScreen.y, tile.dimensions.x, tile.dimensions.y, tile.colour);
 				}
 			}
 		}
