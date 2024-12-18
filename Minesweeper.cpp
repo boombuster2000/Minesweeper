@@ -89,10 +89,16 @@ private:
 	}
 
 public:
-	Minesweeper(IntVector2 dimensions, GameBoard::Square sampleTile) : GameBoard(dimensions, sampleTile)
+	Minesweeper(IntVector2 dimensions, GameBoard::Square sampleTile, AnchorPoints anchorPoint, IntVector2 position) 
+		: GameBoard(dimensions, sampleTile, anchorPoint, position)
 	{
 		m_grid = GenerateBoard<TileGrid, Tile>(dimensions, sampleTile);
-	} 
+	}
+
+	void ProcessMouseInput()
+	{
+
+	}
 };
 
 int main()
@@ -102,15 +108,14 @@ int main()
 
 	GameBoard::Square sampleTile({ 40,40 }, 10, RED);
 
-	Minesweeper board(IntVector2{ 9,9 }, sampleTile);
-	board.SetAnchorPoint(GameBoard::AnchorPoints::MIDDLE);
+	Minesweeper board(IntVector2{ 9,9 }, sampleTile, GameBoard::AnchorPoints::MIDDLE, IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 });
 
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 
-		board.DisplayGrid(IntVector2{GetScreenWidth()/2,GetScreenHeight()/2});
+		board.DisplayGrid();
 
 
 		EndDrawing();
