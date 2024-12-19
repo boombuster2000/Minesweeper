@@ -199,5 +199,9 @@ public:
 			}
 		}
 
+		virtual void ProcessMouseInput()
+		{
+
+		}
 	};
 };
