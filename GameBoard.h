@@ -22,6 +22,12 @@ public:
 	{
 	protected:
 		virtual void Render() const = 0;
+		virtual int GetWidth() const = 0;
+		virtual int GetHeight() const = 0;
+		virtual int GetMarginWidth() const = 0;
+		virtual int GetMarginHeight() const = 0;
+		virtual Color GetColour() const = 0;
+		virtual IntVector2 GetPositionOnScreen() const = 0;
 	};
 
 	class Square : Drawable
@@ -40,6 +46,30 @@ public:
 		void Render() const override
 		{
 			DrawRectangle(positionOnScreen.x, positionOnScreen.y, dimensions.x, dimensions.y, colour);
+		}
+		int GetWidth() const override
+		{
+			return dimensions.x;
+		}
+		int GetHeight() const override
+		{
+			return dimensions.y;
+		}
+		int GetMarginWidth() const override
+		{
+			return margin;
+		}
+		int GetMarginHeight() const override
+		{
+			return margin;
+		}
+		Color GetColour() const override
+		{
+			return colour;
+		}
+		IntVector2 GetPositionOnScreen() const override
+		{
+			return positionOnScreen;
 		}
 	};
 
@@ -119,11 +149,11 @@ public:
 			IntVector2 dimensions;
 			T_Square square = m_grid[0][0];
 
-			dimensions.x = (m_grid[0].size() - 1) * (square.dimensions.x + square.margin);
-			dimensions.y = (m_grid.size() - 1) * (square.dimensions.y + square.margin);
+			dimensions.x = (m_grid[0].size() - 1) * (square.GetWidth() + square.GetMarginWidth());
+			dimensions.y = (m_grid.size() - 1) * (square.GetWidth() + square.GetMarginHeight());
 
-			dimensions.x += square.dimensions.x;
-			dimensions.y += square.dimensions.y;
+			dimensions.x += square.GetWidth();
+			dimensions.y += square.GetHeight();
 
 			return dimensions;
 		}
@@ -193,11 +223,6 @@ public:
 					m_grid[row_index][column_index].positionOnScreen.y = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
 				}
 			}
-		}
-
-		virtual void Render()
-		{
-
 		}
 
 		void DisplayGrid()
