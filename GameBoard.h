@@ -26,51 +26,65 @@ public:
 		virtual int GetHeight() const = 0;
 		virtual int GetMarginWidth() const = 0;
 		virtual int GetMarginHeight() const = 0;
+		virtual void SetColour(Color colour) = 0;
 		virtual Color GetColour() const = 0;
+		virtual void SetPositionOnScreen(int y, int x) = 0;
 		virtual IntVector2 GetPositionOnScreen() const = 0;
 	};
 
 	class Square : Drawable
 	{
-	public:
-		IntVector2 dimensions;
-		IntVector2 positionOnScreen = { 0,0 };
-		int margin;
-		Color colour;
+	private:
+		IntVector2 m_dimensions;
+		IntVector2 m_positionOnScreen = { 0,0 };
+		int m_margin;
+		Color m_colour;
 
-		Square(IntVector2 dimensions_, int margin_, Color colour_)
-			: dimensions(dimensions_), margin(margin_), colour(colour_)
+
+	public:
+		Square(IntVector2 dimensions, int margin, Color colour)
+			: m_dimensions(dimensions), m_margin(margin), m_colour(colour)
 		{
 		};
 
-		void Render() const override
-		{
-			DrawRectangle(positionOnScreen.x, positionOnScreen.y, dimensions.x, dimensions.y, colour);
-		}
 		int GetWidth() const override
 		{
-			return dimensions.x;
+			return m_dimensions.x;
 		}
 		int GetHeight() const override
 		{
-			return dimensions.y;
+			return m_dimensions.y;
 		}
 		int GetMarginWidth() const override
 		{
-			return margin;
+			return m_margin;
 		}
 		int GetMarginHeight() const override
 		{
-			return margin;
+			return m_margin;
+		}
+		void SetColour(Color colour) override
+		{
+			m_colour = colour;
 		}
 		Color GetColour() const override
 		{
-			return colour;
+			return m_colour;
 		}
 		IntVector2 GetPositionOnScreen() const override
 		{
-			return positionOnScreen;
+			return m_positionOnScreen;
 		}
+		void SetPositionOnScreen(int y, int x) override
+		{
+			m_positionOnScreen.x = x;
+			m_positionOnScreen.y = y;
+		}
+		void Render() const override
+		{
+			DrawRectangle(GetPositionOnScreen().x, GetPositionOnScreen().y, GetWidth(), GetHeight(), GetColour());
+		}
+		
 	};
 
 	template <typename T_Square=Square>
@@ -214,13 +228,15 @@ public:
 				break;
 			}
 
-			for (int row_index = 0; row_index < m_grid.size(); row_index++)
+			for (int y = 0; y < m_grid.size(); y++)
 			{
-				for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
+				for (int x = 0; x < m_grid[y].size(); x++)
 				{
-					T_Square tile = m_grid[row_index][column_index];
-					m_grid[row_index][column_index].positionOnScreen.x = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
-					m_grid[row_index][column_index].positionOnScreen.y = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
+					T_Square tile = m_grid[y][x];
+					int xPos = (x * (tile.GetMarginWidth() + tile.GetWidth())) + position.x - offset.x;
+					int yPos = (y * (tile.GetMarginHeight() + tile.GetHeight())) + position.y - offset.y;
+
+					m_grid[y][x].SetPositionOnScreen(yPos, xPos);
 				}
 			}
 		}
