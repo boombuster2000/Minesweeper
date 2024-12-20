@@ -22,12 +22,22 @@ public:
 	{
 	protected:
 		virtual void Render() const = 0;
+
 		virtual int GetWidth() const = 0;
+		virtual void SetWidth(int width) = 0;
+
 		virtual int GetHeight() const = 0;
+		virtual void SetHeight(int height) = 0;
+
 		virtual int GetMarginWidth() const = 0;
+		virtual void SetMarginWidth(int marginWidth) = 0;
+
 		virtual int GetMarginHeight() const = 0;
+		virtual void SetMarginHeight(int marginHeight) = 0;
+
 		virtual void SetColour(Color colour) = 0;
 		virtual Color GetColour() const = 0;
+
 		virtual void SetPositionOnScreen(int y, int x) = 0;
 		virtual IntVector2 GetPositionOnScreen() const = 0;
 	};
@@ -51,18 +61,38 @@ public:
 		{
 			return m_dimensions.x;
 		}
+		void SetWidth(int width) override
+		{
+			m_dimensions.x = width;
+		}
+		
 		int GetHeight() const override
 		{
 			return m_dimensions.y;
 		}
+		void SetHeight(int height) override
+		{
+			m_dimensions.y = height;
+		}
+		
 		int GetMarginWidth() const override
 		{
 			return m_margin;
 		}
+		void SetMarginWidth(int marginWidth) override
+		{
+			m_margin = marginWidth;
+		}
+
 		int GetMarginHeight() const override
 		{
 			return m_margin;
 		}
+		void SetMarginHeight(int marginHeight) override
+		{
+			m_margin = marginHeight;
+		}
+
 		void SetColour(Color colour) override
 		{
 			m_colour = colour;
@@ -71,6 +101,7 @@ public:
 		{
 			return m_colour;
 		}
+		
 		IntVector2 GetPositionOnScreen() const override
 		{
 			return m_positionOnScreen;
@@ -80,6 +111,7 @@ public:
 			m_positionOnScreen.x = x;
 			m_positionOnScreen.y = y;
 		}
+		
 		void Render() const override
 		{
 			DrawRectangle(GetPositionOnScreen().x, GetPositionOnScreen().y, GetWidth(), GetHeight(), GetColour());
