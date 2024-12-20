@@ -17,8 +17,16 @@ struct IntVector2
 class GameBoard
 {
 public:
-	struct Square
+
+	class Drawable
 	{
+	protected:
+		virtual void Render() const = 0;
+	};
+
+	class Square : Drawable
+	{
+	public:
 		IntVector2 dimensions;
 		IntVector2 positionOnScreen = { 0,0 };
 		int margin;
@@ -28,6 +36,11 @@ public:
 			: dimensions(dimensions_), margin(margin_), colour(colour_)
 		{
 		};
+
+		void Render() const override
+		{
+			DrawRectangle(positionOnScreen.x, positionOnScreen.y, dimensions.x, dimensions.y, colour);
+		}
 	};
 
 	template <typename T_Square=Square>
@@ -182,18 +195,21 @@ public:
 			}
 		}
 
+		virtual void Render()
+		{
+
+		}
+
 		void DisplayGrid()
 		{
 
-			for (int row_index = 0; row_index < m_grid.size(); row_index++)
+			for (int y = 0; y < m_grid.size(); y++)
 			{
-				for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
+				for (int x = 0; x < m_grid[y].size(); x++)
 				{
-					T_Square tile = m_grid[row_index][column_index];
-
-					if (ShouldRenderSquare(IntVector2{ column_index, row_index }))
+					if (ShouldRenderSquare(IntVector2{ x, y }))
 					{
-						DrawRectangle(tile.positionOnScreen.x, tile.positionOnScreen.y, tile.dimensions.x, tile.dimensions.y, tile.colour);
+						m_grid[y][x].Render();
 					}
 				}
 			}
