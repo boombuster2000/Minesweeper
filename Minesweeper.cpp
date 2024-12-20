@@ -24,8 +24,9 @@ public:
 		EIGHT = 8
 	};
 
-	struct Tile : GameBoard::Square
+	class Tile : public GameBoard::Square
 	{
+	public:
 		Contents tileContent = Contents::EMPTY;
 		bool isCovered = true;
 
@@ -98,10 +99,9 @@ public:
 		{
 		}
 
-		void ProcessMouseInput()
+		void ProcessMouseInput() override
 		{
 			if (!IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) return;
-
 
 			Vector2 mousePosition = GetMousePosition();
 
@@ -111,12 +111,13 @@ public:
 				{
 					Tile tile = m_grid[y][x];
 
-					if (tile.positionOnScreen.x < mousePosition.x 
-						&& tile.positionOnScreen.x + tile.dimensions.x > mousePosition.x
-						&& tile.positionOnScreen.y < mousePosition.y 
-						&& tile.positionOnScreen.y + tile.dimensions.y > mousePosition.y)
+					if (tile.GetPositionOnScreen().x < mousePosition.x
+						&& tile.GetPositionOnScreen().x + tile.GetWidth() > mousePosition.x
+						&& tile.GetPositionOnScreen().y < mousePosition.y
+						&& tile.GetPositionOnScreen().y + tile.GetHeight() > mousePosition.y)
 					{
-						m_grid[y][x].colour = PURPLE;
+						m_grid[y][x].isCovered = false;
+						m_grid[y][x].SetColour(PURPLE);
 						break;
 					}
 				}
