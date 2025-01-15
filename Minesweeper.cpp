@@ -97,28 +97,42 @@ public:
 		typedef std::vector<std::vector<Tile>> TileGrid;
 
 	private:
+
+		std::vector<Tile> GetNeighbours(IntVector2 homeTileCoords) const
+		{
+			std::vector<Tile> neighbours;
+			int x = homeTileCoords.x;
+			int y = homeTileCoords.y;
+
+			if ((y - 1) >= 0)
+			{
+				if ((x - 1) >= 0) neighbours.push_back(m_grid[y - 1][x - 1]);
+				neighbours.push_back(m_grid[y - 1][x]);
+				if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y - 1][x + 1]);
+			}
+
+			if ((x - 1) >= 0) neighbours.push_back(m_grid[y][x - 1]);
+			if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y][x + 1]);
+
+			if ((y + 1) < m_grid.size())
+			{
+				if ((x - 1) >= 0) neighbours.push_back(m_grid[y + 1][x - 1]);
+				neighbours.push_back(m_grid[y + 1][x]);
+				if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y + 1][x + 1]);
+			}
+
+			return neighbours;
+		}
+
 		int GetNumberOfBombsAroundPoint(TileGrid board, IntVector2 point) const
 		{
 			int count = 0;
+			const std::vector<Tile> neighbours = GetNeighbours(point);
 
-			if (point.y - 1 >= 0 && point.x - 1 >= 0 && board[point.y - 1][point.x - 1].GetContentOption() == Tile::ContentOption::BOMB) count++; // Top Left
-
-			if (point.y - 1 >= 0 && board[point.y - 1][point.x].GetContentOption() == Tile::ContentOption::BOMB) count++; // Top Middle
-
-			if (point.y - 1 >= 0 && point.x + 1 < board[point.y].size() && board[point.y - 1][point.x + 1].GetContentOption() == Tile::ContentOption::BOMB) count++; // Top Right
-
-
-			if (point.x - 1 >= 0 && board[point.y][point.x - 1].GetContentOption() == Tile::ContentOption::BOMB) count++; // Middle Left
-
-			if (point.x + 1 < board[point.y].size() && board[point.y][point.x + 1].GetContentOption() == Tile::ContentOption::BOMB) count++; // Middle Right
-
-
-			if (point.y + 1 < board.size() && point.x - 1 >= 0 && board[point.y + 1][point.x - 1].GetContentOption() == Tile::ContentOption::BOMB) count++; // Bottem Left
-
-			if (point.y + 1 < board.size() && board[point.y + 1][point.x].GetContentOption() == Tile::ContentOption::BOMB) count++; // Bottem Middle
-
-			if (point.y + 1 < board.size() && point.x + 1 < board[point.y].size() && board[point.y + 1][point.x + 1].GetContentOption() == Tile::ContentOption::BOMB) count++; // Bottem Right
-
+			for (auto const &neightbour: neighbours)
+			{
+				if (neightbour.GetContentOption() == Tile::ContentOption::BOMB) count++;
+			}
 
 			return count;
 		}
@@ -151,6 +165,11 @@ public:
 			}
 		}
 
+		void ClearEmptyNeighbours(Tile homeTile)
+		{
+			
+		}
+
 	public:
 		MinesweeperGrid(IntVector2 dimensions, Minesweeper::Tile sampleTile, GameBoard::Grid<Tile>::AnchorPoints anchorPoint, IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
@@ -178,6 +197,8 @@ public:
 						m_grid[y][x].m_isCovered = false;
 						
 						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
+
+
 						break;
 					}
 				}
