@@ -20,106 +20,89 @@ public:
 
 	class Drawable
 	{
-	protected:
-		virtual void Render() const = 0;
-
-		virtual int GetWidth() const = 0;
-		virtual void SetWidth(int width) = 0;
-
-		virtual int GetHeight() const = 0;
-		virtual void SetHeight(int height) = 0;
-
-		virtual int GetMarginWidth() const = 0;
-		virtual void SetMarginWidth(int marginWidth) = 0;
-
-		virtual int GetMarginHeight() const = 0;
-		virtual void SetMarginHeight(int marginHeight) = 0;
-
-		virtual void SetColour(Color colour) = 0;
-		virtual Color GetColour() const = 0;
-
-		virtual void SetPositionOnScreen(int y, int x) = 0;
-		virtual IntVector2 GetPositionOnScreen() const = 0;
-	};
-
-	class Square : Drawable
-	{
 	private:
-		IntVector2 m_dimensions;
+		Texture2D m_renderedTexture;
+		IntVector2 m_margin = { 0,0 };
+		IntVector2 m_dimensions = { 0,0 };
 		IntVector2 m_positionOnScreen = { 0,0 };
-		int m_margin;
-		Color m_colour;
-
-
+	
 	public:
-		Square(IntVector2 dimensions, int margin, Color colour)
-			: m_dimensions(dimensions), m_margin(margin), m_colour(colour)
+		Drawable(const char* textureFilePath, IntVector2 dimensions, IntVector2 margin)
 		{
+			m_renderedTexture = LoadTexture(textureFilePath);
+			m_dimensions = dimensions;
+			m_margin = margin;
+		}
+
+		virtual Texture2D GetTexutre() const
+		{
+			return m_renderedTexture;
+		}
+
+		virtual void SetTexture(const char* textureFilePath)
+		{
+			m_renderedTexture = LoadTexture(textureFilePath);
+		}
+
+		virtual void Render() const
+		{
+			IntVector2 positionOnScreen = GetPositionOnScreen();
+			float scale = m_dimensions.y / m_renderedTexture.height;
+
+			DrawTextureEx(m_renderedTexture, {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
 		};
 
-		int GetWidth() const override
+		virtual int GetWidth() const
 		{
 			return m_dimensions.x;
 		}
-		void SetWidth(int width) override
+
+		virtual void SetWidth(int width)
 		{
 			m_dimensions.x = width;
-		}
-		
-		int GetHeight() const override
+		};
+
+		virtual int GetHeight()
 		{
 			return m_dimensions.y;
 		}
-		void SetHeight(int height) override
+		virtual void SetHeight(int height)
 		{
 			m_dimensions.y = height;
 		}
-		
-		int GetMarginWidth() const override
+
+		virtual int GetMarginWidth() const
 		{
-			return m_margin;
-		}
-		void SetMarginWidth(int marginWidth) override
-		{
-			m_margin = marginWidth;
+			return m_margin.x;
 		}
 
-		int GetMarginHeight() const override
+		virtual void SetMarginWidth(int marginWidth)
 		{
-			return m_margin;
-		}
-		void SetMarginHeight(int marginHeight) override
-		{
-			m_margin = marginHeight;
+			m_margin.x = marginWidth;
 		}
 
-		void SetColour(Color colour) override
+		virtual int GetMarginHeight() const
 		{
-			m_colour = colour;
+			return m_margin.y;
 		}
-		Color GetColour() const override
+
+		virtual void SetMarginHeight(int marginHeight)
 		{
-			return m_colour;
+			m_margin.y = marginHeight;
 		}
-		
-		IntVector2 GetPositionOnScreen() const override
+
+		virtual void SetPositionOnScreen(int y, int x)
+		{
+			m_positionOnScreen = { x,y };
+		};
+
+		virtual IntVector2 GetPositionOnScreen() const
 		{
 			return m_positionOnScreen;
 		}
-		void SetPositionOnScreen(int y, int x) override
-		{
-			m_positionOnScreen.x = x;
-			m_positionOnScreen.y = y;
-		}
-		
-		void Render() const override
-		{
-			DrawRectangle(GetPositionOnScreen().x, GetPositionOnScreen().y, GetWidth(), GetHeight(), GetColour());
-		}
-		
 	};
 
-	template <typename T_Square=Square>
+	template <typename T_Entity = Drawable >
 	class Grid
 	{
 		
@@ -143,8 +126,7 @@ public:
 	protected:
 
 		AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
-
-		typedef std::vector<std::vector<T_Square>> T_Grid;
+		typedef std::vector<std::vector<T_Entity>> T_Grid;
 		T_Grid m_grid;
 
 	protected:
@@ -160,9 +142,9 @@ public:
 			return dis(gen);
 		}
 
-		T_Grid GenerateBoard(IntVector2 dimensions, T_Square sampleSquare)
+		T_Grid GenerateBoard(IntVector2 dimensions, T_Entity sampleSquare)
 		{
-			static_assert(std::is_base_of<Square, T_Square>::value, "T_Square must derive from Grid::Square");
+			static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from Grid::Drawable");
 
 			if (dimensions.x <= 0 || dimensions.y <= 0) {
 				throw std::invalid_argument("Board dimensions must be positive");
@@ -173,7 +155,7 @@ public:
 			// Populate board with tiles.
 			for (int rows_index = 0; rows_index < dimensions.y; rows_index++)
 			{
-				std::vector<T_Square> row;
+				std::vector<T_Entity> row;
 
 				for (int columns_index = 0; columns_index < dimensions.x; columns_index++)
 				{
@@ -193,7 +175,7 @@ public:
 			}
 
 			IntVector2 dimensions;
-			T_Square square = m_grid[0][0];
+			T_Entity square = m_grid[0][0];
 
 			dimensions.x = (m_grid[0].size() - 1) * (square.GetWidth() + square.GetMarginWidth());
 			dimensions.y = (m_grid.size() - 1) * (square.GetWidth() + square.GetMarginHeight());
@@ -204,15 +186,15 @@ public:
 			return dimensions;
 		}
 
-		virtual bool ShouldRenderSquare(IntVector2 coords)
+		virtual bool ShouldRenderEntity(IntVector2 coords)
 		{
 			return true;
 		}
 
 	public:
-		Grid(IntVector2 dimensions, T_Square sampleSquare, AnchorPoints anchorPoint, IntVector2 position)
+		Grid(IntVector2 dimensions, T_Entity sampleEntity, AnchorPoints anchorPoint, IntVector2 position)
 		{
-			m_grid = GenerateBoard(dimensions, sampleSquare);
+			m_grid = GenerateBoard(dimensions, sampleEntity);
 			SetAnchorPoint(anchorPoint);
 			SetPositionsOnScreen(position);
 		}
@@ -264,9 +246,9 @@ public:
 			{
 				for (int x = 0; x < m_grid[y].size(); x++)
 				{
-					T_Square tile = m_grid[y][x];
-					int xPos = (x * (tile.GetMarginWidth() + tile.GetWidth())) + position.x - offset.x;
-					int yPos = (y * (tile.GetMarginHeight() + tile.GetHeight())) + position.y - offset.y;
+					T_Entity entity = m_grid[y][x];
+					int xPos = (x * (entity.GetMarginWidth() + entity.GetWidth())) + position.x - offset.x;
+					int yPos = (y * (entity.GetMarginHeight() + entity.GetHeight())) + position.y - offset.y;
 
 					m_grid[y][x].SetPositionOnScreen(yPos, xPos);
 				}
@@ -280,7 +262,7 @@ public:
 			{
 				for (int x = 0; x < m_grid[y].size(); x++)
 				{
-					if (ShouldRenderSquare(IntVector2{ x, y }))
+					if (ShouldRenderEntity(IntVector2{ x, y }))
 					{
 						m_grid[y][x].Render();
 					}
