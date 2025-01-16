@@ -98,32 +98,6 @@ public:
 
 	private:
 
-		std::vector<Tile> GetNeighbours(IntVector2 homeTileCoords) const
-		{
-			std::vector<Tile> neighbours;
-			int x = homeTileCoords.x;
-			int y = homeTileCoords.y;
-
-			if ((y - 1) >= 0)
-			{
-				if ((x - 1) >= 0) neighbours.push_back(m_grid[y - 1][x - 1]);
-				neighbours.push_back(m_grid[y - 1][x]);
-				if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y - 1][x + 1]);
-			}
-
-			if ((x - 1) >= 0) neighbours.push_back(m_grid[y][x - 1]);
-			if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y][x + 1]);
-
-			if ((y + 1) < m_grid.size())
-			{
-				if ((x - 1) >= 0) neighbours.push_back(m_grid[y + 1][x - 1]);
-				neighbours.push_back(m_grid[y + 1][x]);
-				if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y + 1][x + 1]);
-			}
-
-			return neighbours;
-		}
-
 		int GetNumberOfBombsAroundPoint(TileGrid board, IntVector2 point) const
 		{
 			int count = 0;
@@ -218,8 +192,6 @@ public:
 						
 						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
 						if (tile.GetContentOption() == Tile::ContentOption::EMPTY) ClearEmptyNeighbours(IntVector2{x,y});
-
-
 						break;
 					}
 				}
