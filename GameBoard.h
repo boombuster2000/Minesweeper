@@ -181,7 +181,7 @@ public:
 			return board;
 		}
 
-		IntVector2 GetBoardPixelDimensions()
+		IntVector2 GetBoardPixelDimensions() const
 		{
 			if (m_grid.empty() || m_grid[0].empty()) {
 				throw std::runtime_error("Empty grid");
@@ -199,7 +199,7 @@ public:
 			return dimensions;
 		}
 
-		virtual bool ShouldRenderEntity(IntVector2 coords)
+		virtual bool ShouldRenderEntity(IntVector2 coords) const
 		{
 			return true;
 		}
