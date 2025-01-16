@@ -165,9 +165,27 @@ public:
 			}
 		}
 
-		void ClearEmptyNeighbours(Tile homeTile)
+		void ClearEmptyNeighbours(IntVector2 homeTileCoords)
 		{
-			
+			std::vector<Tile> neighbours = GetNeighbours(homeTileCoords);
+			std::vector<Tile> clearedNeighbours;
+
+			for (auto &neighbour : neighbours)
+			{
+				if (neighbour.GetContentOption() == Tile::ContentOption::BOMB) continue;
+				if (!neighbour.m_isCovered) continue;
+				
+				IntVector2 coords = neighbour.GetCoords();
+				m_grid[coords.y][coords.x].SetTexture(neighbour.m_contentTexture);
+				m_grid[coords.y][coords.x].m_isCovered = false;
+
+				clearedNeighbours.push_back(neighbour);
+			}
+
+			for (auto& clearedNeighbour : clearedNeighbours)
+			{
+				ClearEmptyNeighbours(clearedNeighbour.GetCoords()); // Need to coords of tile.
+			}
 		}
 
 	public:
@@ -189,14 +207,17 @@ public:
 				{
 					Tile tile = m_grid[y][x];
 
-					if (tile.GetPositionOnScreen().x < mousePosition.x
-						&& tile.GetPositionOnScreen().x + tile.GetWidth() > mousePosition.x
-						&& tile.GetPositionOnScreen().y < mousePosition.y
-						&& tile.GetPositionOnScreen().y + tile.GetHeight() > mousePosition.y)
+					const IntVector2 positionOnScreen = tile.GetPositionOnScreen();
+
+					if (positionOnScreen.x < mousePosition.x
+						&& positionOnScreen.x + tile.GetWidth() > mousePosition.x
+						&& positionOnScreen.y < mousePosition.y
+						&& positionOnScreen.y + tile.GetHeight() > mousePosition.y)
 					{
 						m_grid[y][x].m_isCovered = false;
 						
 						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
+						if (tile.GetContentOption() != Tile::ContentOption::BOMB) ClearEmptyNeighbours(IntVector2{x,y});
 
 
 						break;
