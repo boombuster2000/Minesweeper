@@ -253,6 +253,10 @@ int main()
 		{
 			game.ProcessMouseInput();
 		}
+		else
+		{
+			DrawText("You triggered a bomb!", 10, 10, 50, PURPLE);
+		}
 
 		EndDrawing();
 	}
