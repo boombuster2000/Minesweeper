@@ -96,6 +96,7 @@ public:
 	{
 	
 		typedef std::vector<std::vector<Tile>> TileGrid;
+		bool m_isBombTriggered = false;
 
 	private:
 
@@ -200,11 +201,30 @@ public:
 
 						m_grid[y][x].m_isCovered = false;
 						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
-						if (tile.GetContentOption() == Tile::ContentOption::EMPTY) ClearEmptyNeighbours(IntVector2{x,y});
+
+						switch (tile.GetContentOption())
+						{
+						case Tile::ContentOption::EMPTY:
+							ClearEmptyNeighbours(IntVector2{ x,y });
+							break;
+
+						case Tile::ContentOption::BOMB:
+							m_isBombTriggered = true;
+							break;
+
+						default:
+							break;
+						}
+
 						break;
 					}
 				}
 			}
+		}
+	
+		bool IsBombTriggered() const
+		{
+			return m_isBombTriggered;
 		}
 	};
 };
@@ -216,7 +236,7 @@ int main()
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
-	Minesweeper::MinesweeperGrid board(
+	Minesweeper::MinesweeperGrid game(
 		IntVector2{ 9,9 }, 
 		sampleTile, 
 		GameBoard::Grid<Minesweeper::Tile>::AnchorPoints::MIDDLE,
@@ -228,8 +248,11 @@ int main()
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 
-		board.DisplayGrid();
-		board.ProcessMouseInput();
+		game.DisplayGrid();
+		if (!game.IsBombTriggered())
+		{
+			game.ProcessMouseInput();
+		}
 
 		EndDrawing();
 	}
