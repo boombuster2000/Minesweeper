@@ -255,7 +255,7 @@ int main()
 		}
 		else
 		{
-			DrawText("You triggered a bomb!", 10, 10, 50, PURPLE);
+			DrawText("You triggered a bomb!", 20, 10, 50, YELLOW);
 		}
 
 		EndDrawing();
