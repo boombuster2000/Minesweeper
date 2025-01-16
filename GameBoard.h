@@ -288,9 +288,9 @@ public:
 
 		}
 	
-		std::vector<Tile> GetNeighbours(IntVector2 homeTileCoords) const
+		std::vector<T_Entity> GetNeighbours(IntVector2 homeTileCoords) const
 		{
-			std::vector<Tile> neighbours;
+			std::vector<T_Entity> neighbours;
 			int x = homeTileCoords.x;
 			int y = homeTileCoords.y;
 
