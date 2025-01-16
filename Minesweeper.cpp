@@ -217,7 +217,7 @@ public:
 						m_grid[y][x].m_isCovered = false;
 						
 						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
-						if (tile.GetContentOption() != Tile::ContentOption::BOMB) ClearEmptyNeighbours(IntVector2{x,y});
+						if (tile.GetContentOption() == Tile::ContentOption::EMPTY) ClearEmptyNeighbours(IntVector2{x,y});
 
 
 						break;
