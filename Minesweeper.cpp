@@ -94,6 +94,7 @@ public:
 	
 	class MinesweeperGrid : public GameBoard::Grid<Tile> 
 	{
+	
 		typedef std::vector<std::vector<Tile>> TileGrid;
 
 	private:
@@ -171,7 +172,7 @@ public:
 
 		void ProcessMouseInput() override
 		{
-			if (!IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) return;
+			if (!(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))) return;
 
 			Vector2 mousePosition = GetMousePosition();
 
@@ -188,8 +189,16 @@ public:
 						&& positionOnScreen.y < mousePosition.y
 						&& positionOnScreen.y + tile.GetHeight() > mousePosition.y)
 					{
-						m_grid[y][x].m_isCovered = false;
 						
+						if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+						{
+							if (!tile.m_isCovered) break;
+							m_grid[y][x].SetTexture("./resources/textures/flag.png");
+							break;
+						}
+
+
+						m_grid[y][x].m_isCovered = false;
 						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
 						if (tile.GetContentOption() == Tile::ContentOption::EMPTY) ClearEmptyNeighbours(IntVector2{x,y});
 						break;
