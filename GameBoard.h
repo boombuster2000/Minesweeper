@@ -25,6 +25,7 @@ public:
 		IntVector2 m_margin = { 0,0 };
 		IntVector2 m_dimensions = { 0,0 };
 		IntVector2 m_positionOnScreen = { 0,0 };
+		IntVector2 m_coords = { 0,0 };
 	
 	public:
 		Drawable(const char* textureFilePath, IntVector2 dimensions, IntVector2 margin)
@@ -34,17 +35,17 @@ public:
 			m_margin = margin;
 		}
 
-		virtual Texture2D GetTexutre() const
+		Texture2D GetTexutre() const
 		{
 			return m_renderedTexture;
 		}
 
-		virtual void SetTexture(const char* textureFilePath)
+		void SetTexture(const char* textureFilePath)
 		{
 			m_renderedTexture = LoadTexture(textureFilePath);
 		}
 
-		virtual void Render() const
+		void Render() const
 		{
 			IntVector2 positionOnScreen = GetPositionOnScreen();
 			float scale = m_dimensions.y / m_renderedTexture.height;
@@ -52,53 +53,64 @@ public:
 			DrawTextureEx(m_renderedTexture, {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
 		};
 
-		virtual int GetWidth() const
+		int GetWidth() const
 		{
 			return m_dimensions.x;
 		}
 
-		virtual void SetWidth(int width)
+		void SetWidth(int width)
 		{
 			m_dimensions.x = width;
 		};
 
-		virtual int GetHeight()
+		int GetHeight()
 		{
 			return m_dimensions.y;
 		}
-		virtual void SetHeight(int height)
+		
+		void SetHeight(int height)
 		{
 			m_dimensions.y = height;
 		}
 
-		virtual int GetMarginWidth() const
+		int GetMarginWidth() const
 		{
 			return m_margin.x;
 		}
 
-		virtual void SetMarginWidth(int marginWidth)
+		void SetMarginWidth(int marginWidth)
 		{
 			m_margin.x = marginWidth;
 		}
 
-		virtual int GetMarginHeight() const
+		int GetMarginHeight() const
 		{
 			return m_margin.y;
 		}
 
-		virtual void SetMarginHeight(int marginHeight)
+		void SetMarginHeight(int marginHeight)
 		{
 			m_margin.y = marginHeight;
 		}
 
-		virtual void SetPositionOnScreen(int y, int x)
+		void SetPositionOnScreen(int y, int x)
 		{
 			m_positionOnScreen = { x,y };
 		};
 
-		virtual IntVector2 GetPositionOnScreen() const
+		IntVector2 GetPositionOnScreen() const
 		{
 			return m_positionOnScreen;
+		}
+	
+		void SetCoords(IntVector2 coords)
+		{
+			m_coords = coords;
+		}
+
+		IntVector2 GetCoords() const
+		{
+			return m_coords;
 		}
 	};
 
@@ -144,7 +156,7 @@ public:
 
 		T_Grid GenerateBoard(IntVector2 dimensions, T_Entity sampleSquare)
 		{
-			static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from Grid::Drawable");
+			static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from Gameboard::Drawable");
 
 			if (dimensions.x <= 0 || dimensions.y <= 0) {
 				throw std::invalid_argument("Board dimensions must be positive");
@@ -153,12 +165,13 @@ public:
 			T_Grid board;
 
 			// Populate board with tiles.
-			for (int rows_index = 0; rows_index < dimensions.y; rows_index++)
+			for (int y = 0; y < dimensions.y; y++)
 			{
 				std::vector<T_Entity> row;
 
-				for (int columns_index = 0; columns_index < dimensions.x; columns_index++)
+				for (int x = 0; x < dimensions.x; x++)
 				{
+					sampleSquare.SetCoords(IntVector2{ x, y });
 					row.push_back(sampleSquare);
 				}
 
