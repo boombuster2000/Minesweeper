@@ -28,27 +28,29 @@ public:
 			EIGHT = 8
 		};
 		
-		struct ContentTexturesFilePaths
+		struct
 		{
 			const char* bomb = "./resources/textures/bomb.png";
 			const char* coveredTile = "./resources/textures/covered-tile.png";
 			const char* emptyTile = "./resources/textures/empty-tile.png";
 			const char* flag = "./resources/textures/flag.png";
-		};
+		} contentTexturesFilePaths;
 	
 	private:
 		ContentOption m_entityOption = ContentOption::EMPTY;
-
-	public:
+		const char* m_contentTextureFilePath = "./resources/textures/empty-tile.png";
+		const Texture2D m_flagTexture = LoadTexture(contentTexturesFilePaths.flag);
 		bool m_isCovered = true;
-		const char* m_contentTexture = "./resources/textures/empty-tile.png";
+		bool m_isFlagged = false;
 		
+
 	public:
 		Tile(IntVector2 dimensions, IntVector2 margin)
 			:Drawable("./resources/textures/covered-tile.png", dimensions, margin)
 		{
 		}
 
+		
 		ContentOption GetContentOption() const
 		{
 			return m_entityOption;
@@ -60,37 +62,78 @@ public:
 			switch (m_entityOption)
 			{
 			case ContentOption::BOMB:
-				m_contentTexture = "./resources/textures/bomb.png";
+				m_contentTextureFilePath = "./resources/textures/bomb.png";
 				break;
 			case ContentOption::ONE:
-				m_contentTexture = "./resources/textures/one.png";
+				m_contentTextureFilePath = "./resources/textures/one.png";
 				break;
 			case ContentOption::TWO:
-				m_contentTexture = "./resources/textures/two.png";
+				m_contentTextureFilePath = "./resources/textures/two.png";
 				break;
 			case ContentOption::THREE:
-				m_contentTexture = "./resources/textures/three.png";
+				m_contentTextureFilePath = "./resources/textures/three.png";
 				break;
 			case ContentOption::FOUR:
-				m_contentTexture = "./resources/textures/four.png";
+				m_contentTextureFilePath = "./resources/textures/four.png";
 				break;
 			case ContentOption::FIVE:
-				m_contentTexture = "./resources/textures/five.png";
+				m_contentTextureFilePath = "./resources/textures/five.png";
 				break;
 			case ContentOption::SIX:
-				m_contentTexture = "./resources/textures/six.png";
+				m_contentTextureFilePath = "./resources/textures/six.png";
 				break;
 			case ContentOption::SEVEN:
-				m_contentTexture = "./resources/textures/seven.png";
+				m_contentTextureFilePath = "./resources/textures/seven.png";
 				break;
 			case ContentOption::EIGHT:
-				m_contentTexture = "./resources/textures/eight.png";
+				m_contentTextureFilePath = "./resources/textures/eight.png";
 				break;
 			default:
 				break;
 			}
 		}
-};
+
+		const char* GetContentTextureFilePath() const
+		{
+			return m_contentTextureFilePath;
+		}
+		void SetContentTextureFilePath(const char* textureFilePath)
+		{
+			m_contentTextureFilePath = textureFilePath;
+		}
+	
+		bool IsTileCovered() const
+		{
+			return m_isCovered;
+		}
+		void ToggleCovered()
+		{
+			m_isCovered = m_isCovered == 0;
+		}
+	
+		bool IsTileFlagged() const
+		{
+			return m_isFlagged;
+		}
+		void ToggleFlag()
+		{
+			m_isFlagged = m_isFlagged == 0;
+		}
+		
+		void Render() const override
+		{
+			IntVector2 positionOnScreen = GetPositionOnScreen();
+			float scale = GetHeight() / GetTexutre().height;
+
+			DrawTextureEx(GetTexutre(), {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
+
+			if (IsTileFlagged() && IsTileCovered())
+			{
+				DrawTextureEx(m_flagTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
+			}
+		}
+
+	};
 	
 	class MinesweeperGrid : public GameBoard::Grid<Tile> 
 	{
@@ -127,7 +170,7 @@ public:
 
 			for (const auto& [x, y] : bombCoordinates) {
 				m_grid[y][x].SetContentOption(Tile::ContentOption::BOMB);
-				m_grid[y][x].m_contentTexture = "./resources/textures/bomb.png";
+				m_grid[y][x].SetContentTextureFilePath("./resources/textures/bomb.png");
 			}
 
 			// Simplified number assignment
@@ -149,17 +192,18 @@ public:
 			for (auto &neighbour : neighbours)
 			{
 				if (neighbour.GetContentOption() == Tile::ContentOption::BOMB) continue;
-				if (!neighbour.m_isCovered) continue;
+				if (!neighbour.IsTileCovered()) continue;
 				
 				IntVector2 coords = neighbour.GetCoords();
-				m_grid[coords.y][coords.x].SetTexture(neighbour.m_contentTexture);
-				m_grid[coords.y][coords.x].m_isCovered = false;
+				m_grid[coords.y][coords.x].SetTexture(neighbour.GetContentTextureFilePath());
+				m_grid[coords.y][coords.x].ToggleCovered();
 
 				clearedNeighbours.push_back(neighbour);
 			}
 
 			for (auto& clearedNeighbour : clearedNeighbours)
 			{
+				if (clearedNeighbour.GetContentOption() != Tile::ContentOption::BOMB && clearedNeighbour.GetContentOption() != Tile::ContentOption::EMPTY) continue;
 				ClearEmptyNeighbours(clearedNeighbour.GetCoords()); // Need to coords of tile.
 			}
 		}
@@ -191,16 +235,20 @@ public:
 						&& positionOnScreen.y + tile.GetHeight() > mousePosition.y)
 					{
 						
+						if (!m_grid[y][x].IsTileCovered()) continue;
+
 						if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
 						{
-							if (!tile.m_isCovered) break;
-							m_grid[y][x].SetTexture("./resources/textures/flag.png");
-							break;
+							m_grid[y][x].ToggleFlag();
+							continue;
 						}
 
+						// Left click input below
 
-						m_grid[y][x].m_isCovered = false;
-						m_grid[y][x].SetTexture(m_grid[y][x].m_contentTexture);
+						if (m_grid[y][x].IsTileFlagged()) continue;
+
+						m_grid[y][x].ToggleCovered();
+						m_grid[y][x].SetTexture(m_grid[y][x].GetContentTextureFilePath());
 
 						switch (tile.GetContentOption())
 						{
