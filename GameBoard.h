@@ -45,7 +45,7 @@ public:
 			m_renderedTexture = LoadTexture(textureFilePath);
 		}
 
-		void Render() const
+		virtual void Render() const
 		{
 			IntVector2 positionOnScreen = GetPositionOnScreen();
 			float scale = m_dimensions.y / m_renderedTexture.height;
@@ -63,7 +63,7 @@ public:
 			m_dimensions.x = width;
 		};
 
-		int GetHeight()
+		int GetHeight() const
 		{
 			return m_dimensions.y;
 		}
