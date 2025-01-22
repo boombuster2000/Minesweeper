@@ -233,7 +233,7 @@ public:
 			{
 				for (int x = 0; x < m_grid[y].size(); x++)
 				{
-					Tile tile = m_grid[y][x];
+					Tile& tile = m_grid[y][x];
 
 					const IntVector2 positionOnScreen = tile.GetPositionOnScreen();
 
@@ -243,7 +243,7 @@ public:
 						&& positionOnScreen.y + tile.GetHeight() > mousePosition.y)
 					{
 						
-						if (!m_grid[y][x].IsTileCovered()) continue;
+						if (!tile.IsTileCovered()) continue;
 
 						if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
 						{
@@ -253,10 +253,10 @@ public:
 
 						// Left click input below
 
-						if (m_grid[y][x].IsTileFlagged()) continue;
+						if (tile.IsTileFlagged()) continue;
 
-						m_grid[y][x].ToggleCovered();
-						m_grid[y][x].SetTexture(m_grid[y][x].GetContentTextureFilePath());
+						tile.ToggleCovered();
+						tile.SetTexture(m_grid[y][x].GetContentTextureFilePath());
 
 						switch (tile.GetContentOption())
 						{
