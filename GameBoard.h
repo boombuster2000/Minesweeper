@@ -29,10 +29,8 @@ public:
 	
 	public:
 		Drawable(const char* textureFilePath, IntVector2 dimensions, IntVector2 margin)
+			: m_renderedTexture(LoadTexture(textureFilePath)), m_dimensions(dimensions), m_margin(margin)
 		{
-			m_renderedTexture = LoadTexture(textureFilePath);
-			m_dimensions = dimensions;
-			m_margin = margin;
 		}
 
 		Texture2D GetTexutre() const
