@@ -151,7 +151,7 @@ public:
 
 	private:
 
-		int GetNumberOfBombsAroundPoint(TileGrid board, IntVector2 point) const
+		int GetNumberOfBombsAroundPoint(IntVector2 point) const
 		{
 			int count = 0;
 			const std::vector<Tile> neighbours = GetNeighbours(point);
@@ -185,7 +185,7 @@ public:
 			for (int y = 0; y < m_grid.size(); y++) {
 				for (int x = 0; x < m_grid[0].size(); x++) {
 					if (m_grid[y][x].GetContentOption() != Tile::ContentOption::BOMB) {
-						int bombCount = GetNumberOfBombsAroundPoint(m_grid, IntVector2{ x,y });
+						int bombCount = GetNumberOfBombsAroundPoint(IntVector2{ x,y });
 						m_grid[y][x].SetContentOption(static_cast<Tile::ContentOption>(bombCount));
 					}
 				}
