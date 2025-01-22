@@ -116,7 +116,7 @@ public:
 		}
 		void ToggleCovered()
 		{
-			m_isCovered = m_isCovered == 0;
+			m_isCovered = !m_isCovered;
 		}
 	
 		bool IsTileFlagged() const
@@ -125,7 +125,7 @@ public:
 		}
 		void ToggleFlag()
 		{
-			m_isFlagged = m_isFlagged == 0;
+			m_isFlagged = !m_isFlagged;
 		}
 		
 		void Render() const override
