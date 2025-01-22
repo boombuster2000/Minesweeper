@@ -191,7 +191,7 @@ public:
 			T_Entity square = m_grid[0][0];
 
 			dimensions.x = (m_grid[0].size() - 1) * (square.GetWidth() + square.GetMarginWidth());
-			dimensions.y = (m_grid.size() - 1) * (square.GetWidth() + square.GetMarginHeight());
+			dimensions.y = (m_grid.size() - 1) * (square.GetHeight() + square.GetMarginHeight());
 
 			dimensions.x += square.GetWidth();
 			dimensions.y += square.GetHeight();
