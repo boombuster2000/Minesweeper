@@ -34,11 +34,19 @@ public:
 			const char* coveredTile = "./resources/textures/covered-tile.png";
 			const char* emptyTile = "./resources/textures/empty-tile.png";
 			const char* flag = "./resources/textures/flag.png";
+			const char* one = "./resources/textures/one.png";
+			const char* two = "./resources/textures/two.png";
+			const char* three = "./resources/textures/three.png";
+			const char* four = "./resources/textures/four.png";
+			const char* five = "./resources/textures/five.png";
+			const char* six = "./resources/textures/six.png";
+			const char* seven = "./resources/textures/seven.png";
+			const char* eight = "./resources/textures/eight.png";
 		} contentTexturesFilePaths;
 	
 	private:
 		ContentOption m_entityOption = ContentOption::EMPTY;
-		const char* m_contentTextureFilePath = "./resources/textures/empty-tile.png";
+		const char* m_contentTextureFilePath = contentTexturesFilePaths.emptyTile;
 		const Texture2D m_flagTexture = LoadTexture(contentTexturesFilePaths.flag);
 		bool m_isCovered = true;
 		bool m_isFlagged = false;
@@ -62,31 +70,31 @@ public:
 			switch (m_entityOption)
 			{
 			case ContentOption::BOMB:
-				m_contentTextureFilePath = "./resources/textures/bomb.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.bomb;
 				break;
 			case ContentOption::ONE:
-				m_contentTextureFilePath = "./resources/textures/one.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.one;
 				break;
 			case ContentOption::TWO:
-				m_contentTextureFilePath = "./resources/textures/two.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.two;
 				break;
 			case ContentOption::THREE:
-				m_contentTextureFilePath = "./resources/textures/three.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.three;
 				break;
 			case ContentOption::FOUR:
-				m_contentTextureFilePath = "./resources/textures/four.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.four;
 				break;
 			case ContentOption::FIVE:
-				m_contentTextureFilePath = "./resources/textures/five.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.five;
 				break;
 			case ContentOption::SIX:
-				m_contentTextureFilePath = "./resources/textures/six.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.six;
 				break;
 			case ContentOption::SEVEN:
-				m_contentTextureFilePath = "./resources/textures/seven.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.seven;
 				break;
 			case ContentOption::EIGHT:
-				m_contentTextureFilePath = "./resources/textures/eight.png";
+				m_contentTextureFilePath = contentTexturesFilePaths.eight;
 				break;
 			default:
 				break;
