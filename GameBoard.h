@@ -28,12 +28,12 @@ public:
 		IntVector2 m_coords = { 0,0 };
 	
 	public:
-		Drawable(const char* textureFilePath, IntVector2 dimensions, IntVector2 margin)
+		Drawable(const char* textureFilePath, const IntVector2 dimensions, const IntVector2 margin)
 			: m_renderedTexture(LoadTexture(textureFilePath)), m_dimensions(dimensions), m_margin(margin)
 		{
 		}
 
-		Texture2D GetTexutre() const
+		Texture2D GetTexture() const
 		{
 			return m_renderedTexture;
 		}
@@ -56,7 +56,7 @@ public:
 			return m_dimensions.x;
 		}
 
-		void SetWidth(int width)
+		void SetWidth(const int width)
 		{
 			m_dimensions.x = width;
 		};
@@ -66,7 +66,7 @@ public:
 			return m_dimensions.y;
 		}
 		
-		void SetHeight(int height)
+		void SetHeight(const int height)
 		{
 			m_dimensions.y = height;
 		}
@@ -76,7 +76,7 @@ public:
 			return m_margin.x;
 		}
 
-		void SetMarginWidth(int marginWidth)
+		void SetMarginWidth(const int marginWidth)
 		{
 			m_margin.x = marginWidth;
 		}
@@ -86,12 +86,12 @@ public:
 			return m_margin.y;
 		}
 
-		void SetMarginHeight(int marginHeight)
+		void SetMarginHeight(const int marginHeight)
 		{
 			m_margin.y = marginHeight;
 		}
 
-		void SetPositionOnScreen(int y, int x)
+		void SetPositionOnScreen(const int y, const int x)
 		{
 			m_positionOnScreen = { x,y };
 		};
@@ -101,7 +101,7 @@ public:
 			return m_positionOnScreen;
 		}
 	
-		void SetCoords(IntVector2 coords)
+		void SetCoords(const IntVector2 coords)
 		{
 			m_coords = coords;
 		}
@@ -118,7 +118,7 @@ public:
 		
 	public:
 
-		enum AnchorPoints
+		const enum AnchorPoints
 		{
 			TOP_LEFT,
 			TOP_MIDDLE,
@@ -140,7 +140,7 @@ public:
 		T_Grid m_grid;
 
 	protected:
-		int GenerateRandomInteger(int min, int max) {
+		int GenerateRandomInteger(const int min, const int max) {
 			// Create a random device and a Mersenne Twister random number generator
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -152,7 +152,7 @@ public:
 			return dis(gen);
 		}
 
-		T_Grid GenerateBoard(IntVector2 dimensions, T_Entity sampleSquare)
+		T_Grid GenerateBoard(const IntVector2 dimensions, T_Entity sampleSquare)
 		{
 			static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from Gameboard::Drawable");
 
@@ -197,24 +197,24 @@ public:
 			return dimensions;
 		}
 
-		virtual bool ShouldRenderEntity(IntVector2 coords) const
+		virtual bool ShouldRenderEntity(const IntVector2 coords) const
 		{
 			return true;
 		}
 
 	public:
-		Grid(IntVector2 dimensions, T_Entity sampleEntity, AnchorPoints anchorPoint, IntVector2 position)
+		Grid(const IntVector2 dimensions, const T_Entity sampleEntity, const AnchorPoints anchorPoint, const IntVector2 position)
 		{
 			m_grid = GenerateBoard(dimensions, sampleEntity);
 			SetAnchorPoint(anchorPoint);
 			SetPositionsOnScreen(position);
 		}
 
-		void SetAnchorPoint(AnchorPoints anchorPoint) {
+		void SetAnchorPoint(const AnchorPoints anchorPoint) {
 			m_anchorPoint = anchorPoint;
 		}
 
-		void SetPositionsOnScreen(IntVector2 position)
+		void SetPositionsOnScreen(const IntVector2 position)
 			// Function adds position of each square on the screen to it's attributes so other methods can access it.
 		{
 			IntVector2 offset = { 0,0 }; // Default for top left anchor point;
@@ -286,7 +286,7 @@ public:
 
 		}
 	
-		std::vector<T_Entity> GetNeighbours(IntVector2 homeTileCoords) const
+		std::vector<T_Entity> GetNeighbours(const IntVector2 homeTileCoords) const
 		{
 			std::vector<T_Entity> neighbours;
 			int x = homeTileCoords.x;

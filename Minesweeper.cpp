@@ -53,11 +53,10 @@ public:
 		
 
 	public:
-		Tile(IntVector2 dimensions, IntVector2 margin)
+		Tile(const IntVector2 dimensions, const IntVector2 margin)
 			:Drawable("./resources/textures/covered-tile.png", dimensions, margin)
 		{
 		}
-
 		
 		ContentOption GetContentOption() const
 		{
@@ -131,9 +130,9 @@ public:
 		void Render() const override
 		{
 			IntVector2 positionOnScreen = GetPositionOnScreen();
-			float scale = GetHeight() / GetTexutre().height;
+			float scale = GetHeight() / GetTexture().height;
 
-			DrawTextureEx(GetTexutre(), {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
+			DrawTextureEx(GetTexture(), {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
 
 			if (IsTileFlagged() && IsTileCovered())
 			{
@@ -151,7 +150,7 @@ public:
 
 	private:
 
-		int GetNumberOfBombsAroundPoint(IntVector2 point) const
+		int GetNumberOfBombsAroundPoint(const IntVector2 point) const
 		{
 			int count = 0;
 			const std::vector<Tile> neighbours = GetNeighbours(point);
@@ -192,7 +191,7 @@ public:
 			}
 		}
 
-		void ClearEmptyNeighbours(IntVector2 homeTileCoords)
+		void ClearEmptyNeighbours(const IntVector2 homeTileCoords)
 		{
 			std::vector<Tile> neighbours = GetNeighbours(homeTileCoords);
 			std::vector<Tile> clearedNeighbours;
@@ -217,7 +216,7 @@ public:
 		}
 
 	public:
-		MinesweeperGrid(IntVector2 dimensions, Minesweeper::Tile sampleTile, GameBoard::Grid<Tile>::AnchorPoints anchorPoint, IntVector2 position)
+		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::Grid<Tile>::AnchorPoints anchorPoint, const IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
 		{
 			PlaceBombsOnBoard();
