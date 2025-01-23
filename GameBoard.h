@@ -188,11 +188,8 @@ public:
 			IntVector2 dimensions;
 			T_Entity square = m_grid[0][0];
 
-			dimensions.x = (m_grid[0].size() - 1) * (square.GetWidth() + square.GetMarginWidth());
-			dimensions.y = (m_grid.size() - 1) * (square.GetHeight() + square.GetMarginHeight());
-
-			dimensions.x += square.GetWidth();
-			dimensions.y += square.GetHeight();
+			dimensions.x = m_grid[0].size() * square.GetWidth() + (m_grid[0].size() - 1) * square.GetMarginWidth();
+			dimensions.y = m_grid.size() * square.GetHeight() + (m_grid.size() - 1) * square.GetMarginHeight();
 
 			return dimensions;
 		}
