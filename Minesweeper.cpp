@@ -210,7 +210,7 @@ public:
 
 			for (auto& clearedNeighbour : clearedNeighbours)
 			{
-				if (clearedNeighbour.GetContentOption() != Tile::ContentOption::BOMB && clearedNeighbour.GetContentOption() != Tile::ContentOption::EMPTY) continue;
+				if (clearedNeighbour.GetContentOption() != Tile::ContentOption::EMPTY) continue;
 				ClearEmptyNeighbours(clearedNeighbour.GetCoords()); // Need to coords of tile.
 			}
 		}
