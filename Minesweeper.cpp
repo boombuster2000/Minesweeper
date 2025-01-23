@@ -215,6 +215,38 @@ public:
 			}
 		}
 
+		bool IsTileUnderMouse(const Tile& tile, const Vector2& mousePosition) const {
+			const IntVector2 pos = tile.GetPositionOnScreen();
+			return 
+				pos.x < mousePosition.x && pos.x + tile.GetWidth() > mousePosition.x && 
+				pos.y < mousePosition.y && pos.y + tile.GetHeight() > mousePosition.y;
+
+		}
+
+		void HandleRightClick(Tile& tile) {
+			if (tile.IsTileCovered()) {
+				tile.ToggleFlag();	
+			}
+		}
+
+		void HandleLeftClick(Tile& tile) {
+			if (!tile.IsTileCovered() || tile.IsTileFlagged()) return;
+			
+			tile.ToggleCovered();
+			tile.SetTexture(tile.GetContentTextureFilePath());
+			
+			switch (tile.GetContentOption()) {
+				case Tile::ContentOption::EMPTY:
+					ClearEmptyNeighbours(tile.GetCoords());
+					break;
+				case Tile::ContentOption::BOMB:
+					m_isBombTriggered = true;
+					break;
+				default:
+					break;
+			}
+		}
+
 	public:
 		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::Grid<Tile>::AnchorPoints anchorPoint, const IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
@@ -228,51 +260,16 @@ public:
 
 			Vector2 mousePosition = GetMousePosition();
 
-			for (int y = 0; y < m_grid.size(); y++)
+			for (auto& row : m_grid)
 			{
-				for (int x = 0; x < m_grid[y].size(); x++)
+				for (auto& tile : row)
 				{
-					Tile& tile = m_grid[y][x];
+					if (!IsTileUnderMouse(tile, mousePosition)) continue;
 
-					const IntVector2 positionOnScreen = tile.GetPositionOnScreen();
-
-					if (positionOnScreen.x < mousePosition.x
-						&& positionOnScreen.x + tile.GetWidth() > mousePosition.x
-						&& positionOnScreen.y < mousePosition.y
-						&& positionOnScreen.y + tile.GetHeight() > mousePosition.y)
-					{
-						
-						if (!tile.IsTileCovered()) continue;
-
-						if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-						{
-							m_grid[y][x].ToggleFlag();
-							continue;
-						}
-
-						// Left click input below
-
-						if (tile.IsTileFlagged()) continue;
-
-						tile.ToggleCovered();
-						tile.SetTexture(m_grid[y][x].GetContentTextureFilePath());
-
-						switch (tile.GetContentOption())
-						{
-						case Tile::ContentOption::EMPTY:
-							ClearEmptyNeighbours(IntVector2{ x,y });
-							break;
-
-						case Tile::ContentOption::BOMB:
-							m_isBombTriggered = true;
-							break;
-
-						default:
-							break;
-						}
-
-						break;
-					}
+					if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) HandleLeftClick(tile);
+					else if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) HandleRightClick(tile); 
+					
+					break;
 				}
 			}
 		}
