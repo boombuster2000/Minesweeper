@@ -40,6 +40,9 @@ public:
 
 		void SetTexture(const char* textureFilePath)
 		{
+			if (!FileExists(textureFilePath)) throw std::invalid_argument("File does not exist.");
+
+
 			m_renderedTexture = LoadTexture(textureFilePath);
 		}
 
