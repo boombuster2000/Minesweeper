@@ -49,7 +49,10 @@ public:
 		virtual void Render() const
 		{
 			IntVector2 positionOnScreen = GetPositionOnScreen();
-			float scale = m_dimensions.y / m_renderedTexture.height;
+			float scaleY = m_dimensions.y / m_renderedTexture.height;
+			float scaleX = m_dimensions.x / m_renderedTexture.width;
+
+			float scale = std::min(scaleX, scaleY);
 
 			DrawTextureEx(m_renderedTexture, {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
 		};
@@ -237,7 +240,8 @@ public:
 				break;
 
 			case BOTTOM_LEFT:
-				offset.y = pixelDimensions.y; break;
+				offset.y = pixelDimensions.y; 
+				break;
 
 			case BOTTOM_MIDDLE:
 				offset.x = int(pixelDimensions.x / 2);
