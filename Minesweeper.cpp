@@ -201,8 +201,11 @@ public:
 				if (neighbour.GetContentOption() == Tile::ContentOption::BOMB) continue;
 				if (!neighbour.IsTileCovered()) continue;
 				
-				neighbour.SetTexture(neighbour.GetContentTextureFilePath());
-				neighbour.ToggleCovered();
+				IntVector2 coords = neighbour.GetCoords();
+				Tile& tile = m_grid[coords.y][coords.x];
+
+				tile.SetTexture(neighbour.GetContentTextureFilePath());
+				tile.ToggleCovered();
 
 				clearedNeighbours.push_back(neighbour);
 			}
