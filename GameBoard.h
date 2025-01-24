@@ -283,11 +283,11 @@ public:
 
 		}
 	
-		std::vector<T_Entity> GetNeighbours(const IntVector2 homeTileCoords) const
+		std::vector<T_Entity> GetNeighbours(const T_Entity& tile) const
 		{
 			std::vector<T_Entity> neighbours;
-			int x = homeTileCoords.x;
-			int y = homeTileCoords.y;
+			int x = tile.GetCoords().x;
+			int y =	tile.GetCoords().y;
 
 			if ((y - 1) >= 0)
 			{
@@ -308,5 +308,5 @@ public:
 
 			return neighbours;
 		}
-};
+	};
 };

@@ -150,10 +150,10 @@ public:
 
 	private:
 
-		int GetNumberOfBombsAroundPoint(const IntVector2 point) const
+		int GetNumberOfBombsAroundTile(const Tile& tile) const
 		{
 			int count = 0;
-			const std::vector<Tile> neighbours = GetNeighbours(point);
+			const std::vector<Tile> neighbours = GetNeighbours(tile);
 
 			for (auto const &neightbour: neighbours)
 			{
@@ -172,7 +172,7 @@ public:
 				bombCoordinates.insert({
 					GenerateRandomInteger(0, m_grid[0].size() - 1),
 					GenerateRandomInteger(0, m_grid.size() - 1)
-					});
+				});
 			}
 
 			for (const auto& [x, y] : bombCoordinates) {
@@ -184,16 +184,16 @@ public:
 			for (int y = 0; y < m_grid.size(); y++) {
 				for (int x = 0; x < m_grid[0].size(); x++) {
 					if (m_grid[y][x].GetContentOption() != Tile::ContentOption::BOMB) {
-						int bombCount = GetNumberOfBombsAroundPoint(IntVector2{ x,y });
+						int bombCount = GetNumberOfBombsAroundTile(m_grid[y][x]);
 						m_grid[y][x].SetContentOption(static_cast<Tile::ContentOption>(bombCount));
 					}
 				}
 			}
 		}
 
-		void ClearEmptyNeighbours(const IntVector2 homeTileCoords)
+		void ClearEmptyNeighbours(const Tile& homeTile)
 		{
-			std::vector<Tile> neighbours = GetNeighbours(homeTileCoords);
+			std::vector<Tile> neighbours = GetNeighbours(homeTile);
 			std::vector<Tile> clearedNeighbours;
 
 			for (auto &neighbour : neighbours)
@@ -201,9 +201,8 @@ public:
 				if (neighbour.GetContentOption() == Tile::ContentOption::BOMB) continue;
 				if (!neighbour.IsTileCovered()) continue;
 				
-				IntVector2 coords = neighbour.GetCoords();
-				m_grid[coords.y][coords.x].SetTexture(neighbour.GetContentTextureFilePath());
-				m_grid[coords.y][coords.x].ToggleCovered();
+				neighbour.SetTexture(neighbour.GetContentTextureFilePath());
+				neighbour.ToggleCovered();
 
 				clearedNeighbours.push_back(neighbour);
 			}
@@ -211,7 +210,7 @@ public:
 			for (auto& clearedNeighbour : clearedNeighbours)
 			{
 				if (clearedNeighbour.GetContentOption() != Tile::ContentOption::EMPTY) continue;
-				ClearEmptyNeighbours(clearedNeighbour.GetCoords()); // Need to coords of tile.
+				ClearEmptyNeighbours(clearedNeighbour); // Need to coords of tile.
 			}
 		}
 
@@ -237,7 +236,7 @@ public:
 			
 			switch (tile.GetContentOption()) {
 				case Tile::ContentOption::EMPTY:
-					ClearEmptyNeighbours(tile.GetCoords());
+					ClearEmptyNeighbours(tile);
 					break;
 				case Tile::ContentOption::BOMB:
 					m_isBombTriggered = true;
