@@ -144,8 +144,16 @@ public:
 	
 	class MinesweeperGrid : public GameBoard::Grid<Tile> 
 	{
+
+	private:
 	
 		typedef std::vector<std::vector<Tile>> TileGrid;
+
+		float bombDensity = 0.15f;
+		int numberOfBombs;
+		int numberofBombsLeft;
+		int numberOfFlagsLeft;
+
 		bool m_isBombTriggered = false;
 
 	private:
@@ -164,8 +172,6 @@ public:
 		}
 
 		void PlaceBombsOnBoard() {
-			const float BOMB_DENSITY = 0.15f; // 15% of tiles are bombs
-			const int numberOfBombs = static_cast<int>(m_grid.size() * m_grid[0].size() * BOMB_DENSITY);
 
 			std::set<std::pair<int, int>> bombCoordinates;
 			while (bombCoordinates.size() < numberOfBombs) {
@@ -253,6 +259,10 @@ public:
 		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::Grid<Tile>::AnchorPoints anchorPoint, const IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
 		{
+			numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * bombDensity);
+			numberofBombsLeft = numberOfBombs;
+			numberOfFlagsLeft = numberOfBombs;
+
 			PlaceBombsOnBoard();
 		}
 
