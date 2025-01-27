@@ -182,7 +182,7 @@ public:
 				board.push_back(row);
 			}
 
-			return board;
+			return std::move(board);
 		}
 
 		IntVector2 GetBoardPixelDimensions() const
