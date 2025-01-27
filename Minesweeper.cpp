@@ -151,7 +151,7 @@ public:
 
 		float bombDensity = 0.15f;
 		int numberOfBombs;
-		int numberofBombsLeft;
+		int numberOfBombsLeft;
 		int numberOfFlagsLeft;
 
 		bool m_isBombTriggered = false;
@@ -232,9 +232,22 @@ public:
 		}
 
 		void HandleRightClick(Tile& tile) {
-			if (tile.IsTileCovered()) {
-				tile.ToggleFlag();	
+			if (!tile.IsTileCovered()) return;
+
+			if (tile.IsTileFlagged())
+			{
+				if (tile.GetContentOption() == Tile::ContentOption::BOMB) numberOfBombsLeft -= 1;
+				numberOfFlagsLeft -= 1;
 			}
+			else
+			{
+				if (tile.GetContentOption() == Tile::ContentOption::BOMB) numberOfBombsLeft += 1;
+				numberOfFlagsLeft += 1;
+			}
+			
+
+			tile.ToggleFlag();
+			
 		}
 
 		void HandleLeftClick(Tile& tile) {
@@ -260,7 +273,7 @@ public:
 			: Grid(dimensions, sampleTile, anchorPoint, position)
 		{
 			numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * bombDensity);
-			numberofBombsLeft = numberOfBombs;
+			numberOfBombsLeft = numberOfBombs;
 			numberOfFlagsLeft = numberOfBombs;
 
 			PlaceBombsOnBoard();
