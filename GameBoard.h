@@ -17,164 +17,300 @@ struct IntVector2
 class GameBoard
 {
 public:
-	static struct Square
-	{
-		IntVector2 dimensions;
-		int margin;
-		Color colour;
 
-		Square(IntVector2 dimensions_, int margin_, Color colour_)
-			: dimensions(dimensions_), margin(margin_), colour(colour_)
+	class Drawable
+	{
+	private:
+		Texture2D m_renderedTexture;
+		IntVector2 m_margin = { 0,0 };
+		IntVector2 m_dimensions = { 0,0 };
+		IntVector2 m_positionOnScreen = { 0,0 };
+		IntVector2 m_coords = { 0,0 };
+	
+	public:
+		Drawable(const char* textureFilePath, const IntVector2 dimensions, const IntVector2 margin)
+			: m_renderedTexture(LoadTexture(textureFilePath)), m_dimensions(dimensions), m_margin(margin)
 		{
+		}
+
+		Texture2D GetTexture() const
+		{
+			return m_renderedTexture;
+		}
+
+		void SetTexture(const char* textureFilePath)
+		{
+			if (!FileExists(textureFilePath)) throw std::invalid_argument("File does not exist.");
+
+
+			m_renderedTexture = LoadTexture(textureFilePath);
+		}
+
+		virtual void Render() const
+		{
+			IntVector2 positionOnScreen = GetPositionOnScreen();
+			float scaleY = m_dimensions.y / m_renderedTexture.height;
+			float scaleX = m_dimensions.x / m_renderedTexture.width;
+
+			float scale = std::min(scaleX, scaleY);
+
+			DrawTextureEx(m_renderedTexture, {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
 		};
 
-	};
-
-	static enum AnchorPoints
-	{
-		TOP_LEFT,
-		TOP_MIDDLE,
-		TOP_RIGHT,
-
-		MIDDLE_LEFT,
-		MIDDLE,
-		MIDDLE_RIGHT,
-
-		BOTTOM_LEFT,
-		BOTTOM_MIDDLE,
-		BOTTOM_RIGHT,
-	};
-
-protected:
-
-	AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
-
-	typedef std::vector<std::vector<Square>> SquareGrid;
-	SquareGrid m_grid;
-
-protected:
-	int GenerateRandomInteger(int min, int max) {
-		// Create a random device and a Mersenne Twister random number generator
-		std::random_device rd;
-		std::mt19937 gen(rd());
-
-		// Define a distribution in the specified range [min, max]
-		std::uniform_int_distribution<int> dis(min, max);
-
-		// Generate and return the random number
-		return dis(gen);
-	}
-
-	template <typename T_Grid = SquareGrid, typename T_Square = Square>
-	T_Grid GenerateBoard(IntVector2 dimensions, T_Square sampleSquare)
-	{
-		static_assert(std::is_base_of<Square, T_Square>::value, "T_Square must derive from Grid::Square");
-
-		if (dimensions.x <= 0 || dimensions.y <= 0) {
-			throw std::invalid_argument("Board dimensions must be positive");
+		int GetWidth() const
+		{
+			return m_dimensions.x;
 		}
 
-		T_Grid board;
-
-		// Populate board with tiles.
-		for (int rows_index = 0; rows_index < dimensions.y; rows_index++)
+		void SetWidth(const int width)
 		{
-			std::vector<T_Square> row;
+			m_dimensions.x = width;
+		};
 
-			for (int columns_index = 0; columns_index < dimensions.x; columns_index++)
-			{
-				row.push_back(sampleSquare);
+		int GetHeight() const
+		{
+			return m_dimensions.y;
+		}
+		
+		void SetHeight(const int height)
+		{
+			m_dimensions.y = height;
+		}
+
+		int GetMarginWidth() const
+		{
+			return m_margin.x;
+		}
+
+		void SetMarginWidth(const int marginWidth)
+		{
+			m_margin.x = marginWidth;
+		}
+
+		int GetMarginHeight() const
+		{
+			return m_margin.y;
+		}
+
+		void SetMarginHeight(const int marginHeight)
+		{
+			m_margin.y = marginHeight;
+		}
+
+		void SetPositionOnScreen(const int y, const int x)
+		{
+			m_positionOnScreen = { x,y };
+		};
+
+		IntVector2 GetPositionOnScreen() const
+		{
+			return m_positionOnScreen;
+		}
+	
+		void SetCoords(const IntVector2 coords)
+		{
+			m_coords = coords;
+		}
+
+		IntVector2 GetCoords() const
+		{
+			return m_coords;
+		}
+	};
+
+	template <typename T_Entity = Drawable >
+	class Grid
+	{
+		
+	public:
+
+		const enum AnchorPoints
+		{
+			TOP_LEFT,
+			TOP_MIDDLE,
+			TOP_RIGHT,
+
+			MIDDLE_LEFT,
+			MIDDLE,
+			MIDDLE_RIGHT,
+
+			BOTTOM_LEFT,
+			BOTTOM_MIDDLE,
+			BOTTOM_RIGHT,
+		};
+
+	protected:
+
+		AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
+		typedef std::vector<std::vector<T_Entity>> T_Grid;
+		T_Grid m_grid;
+
+	protected:
+		int GenerateRandomInteger(const int min, const int max) {
+			// Create a random device and a Mersenne Twister random number generator
+			std::random_device rd;
+			std::mt19937 gen(rd());
+
+			// Define a distribution in the specified range [min, max]
+			std::uniform_int_distribution<int> dis(min, max);
+
+			// Generate and return the random number
+			return dis(gen);
+		}
+
+		T_Grid GenerateBoard(const IntVector2 dimensions, T_Entity sampleSquare)
+		{
+			static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from Gameboard::Drawable");
+
+			if (dimensions.x <= 0 || dimensions.y <= 0) {
+				throw std::invalid_argument("Board dimensions must be positive");
 			}
 
-			board.push_back(row);
-		}
+			T_Grid board;
 
-		return board;
-	}
-
-	IntVector2 GetBoardPixelDimensions()
-	{
-		if (m_grid.empty() || m_grid[0].empty()) {
-			throw std::runtime_error("Empty grid");
-		}
-
-		IntVector2 dimensions;
-		Square tile = m_grid[0][0];
-
-		dimensions.x = (m_grid[0].size() - 1) * (tile.dimensions.x + tile.margin);
-		dimensions.y = (m_grid.size() - 1) * (tile.dimensions.y + tile.margin);
-
-		dimensions.x += tile.dimensions.x;
-		dimensions.y += tile.dimensions.y;
-
-		return dimensions;
-	}
-
-	virtual bool ShouldRenderSquare(IntVector2 coords)
-	{
-		return true;
-	}
-
-public:
-	GameBoard(IntVector2 dimensions, Square sampleSquare):m_grid(GenerateBoard(dimensions, sampleSquare))
-	{
-	}
-
-	void SetAnchorPoint(AnchorPoints anchorPoint) {
-		m_anchorPoint = anchorPoint;
-	}
-
-	void DisplayGrid(IntVector2 position)
-	{
-		IntVector2 offset = { 0,0 }; // Default for top left anchor point;
-		IntVector2 pixelDimensions = GetBoardPixelDimensions();
-
-		switch (m_anchorPoint)
-		{
-		case TOP_MIDDLE: offset.x = int(pixelDimensions.x / 2); break;
-		case TOP_RIGHT: offset.x = pixelDimensions.x; break;
-		case MIDDLE_LEFT: offset.y = int(pixelDimensions.y / 2); break;
-
-		case MIDDLE: 
-			offset.x = int(pixelDimensions.x / 2); 
-			offset.y = int(pixelDimensions.y / 2); 
-			break;
-
-		case MIDDLE_RIGHT: 
-			offset.x = pixelDimensions.x;
-			offset.y = int(pixelDimensions.y / 2);
-			break;
-
-		case BOTTOM_LEFT: 
-			offset.y = pixelDimensions.y; break;
-
-		case BOTTOM_MIDDLE:
-			offset.x = int(pixelDimensions.x / 2); 
-			offset.y = pixelDimensions.y; 
-			break;
-
-		case BOTTOM_RIGHT:
-			offset.x = pixelDimensions.x; 
-			offset.y = pixelDimensions.y; 
-			break;
-
-		default: 
-			break;
-		}
-
-		for (int row_index = 0; row_index < m_grid.size(); row_index++)
-		{
-			for (int column_index = 0; column_index < m_grid[row_index].size(); column_index++)
+			// Populate board with tiles.
+			for (int y = 0; y < dimensions.y; y++)
 			{
-				if (ShouldRenderSquare(IntVector2{ column_index, row_index }))
-				{
-					Square tile = m_grid[row_index][column_index];
-					int xPos = (column_index * (tile.margin + tile.dimensions.x)) + position.x - offset.x;
-					int yPos = (row_index * (tile.margin + tile.dimensions.y)) + position.y - offset.y;
+				std::vector<T_Entity> row;
 
-					DrawRectangle(xPos, yPos, tile.dimensions.x, tile.dimensions.y, tile.colour);
+				for (int x = 0; x < dimensions.x; x++)
+				{
+					sampleSquare.SetCoords(IntVector2{ x, y });
+					row.push_back(sampleSquare);
+				}
+
+				board.push_back(row);
+			}
+
+			return board;
+		}
+
+		IntVector2 GetBoardPixelDimensions() const
+		{
+			if (m_grid.empty() || m_grid[0].empty()) {
+				throw std::runtime_error("Empty grid");
+			}
+
+			IntVector2 dimensions;
+			T_Entity square = m_grid[0][0];
+
+			dimensions.x = m_grid[0].size() * square.GetWidth() + (m_grid[0].size() - 1) * square.GetMarginWidth();
+			dimensions.y = m_grid.size() * square.GetHeight() + (m_grid.size() - 1) * square.GetMarginHeight();
+
+			return dimensions;
+		}
+
+		virtual bool ShouldRenderEntity(const IntVector2 coords) const
+		{
+			return true;
+		}
+
+	public:
+		Grid(const IntVector2 dimensions, const T_Entity sampleEntity, const AnchorPoints anchorPoint, const IntVector2 position)
+		{
+			m_grid = GenerateBoard(dimensions, sampleEntity);
+			SetAnchorPoint(anchorPoint);
+			SetPositionsOnScreen(position);
+		}
+
+		void SetAnchorPoint(const AnchorPoints anchorPoint) {
+			m_anchorPoint = anchorPoint;
+		}
+
+		void SetPositionsOnScreen(const IntVector2 position)
+			// Function adds position of each square on the screen to it's attributes so other methods can access it.
+		{
+			IntVector2 offset = { 0,0 }; // Default for top left anchor point;
+			IntVector2 pixelDimensions = GetBoardPixelDimensions();
+
+			switch (m_anchorPoint)
+			{
+			case TOP_MIDDLE: offset.x = int(pixelDimensions.x / 2); break;
+			case TOP_RIGHT: offset.x = pixelDimensions.x; break;
+			case MIDDLE_LEFT: offset.y = int(pixelDimensions.y / 2); break;
+
+			case MIDDLE:
+				offset.x = int(pixelDimensions.x / 2);
+				offset.y = int(pixelDimensions.y / 2);
+				break;
+
+			case MIDDLE_RIGHT:
+				offset.x = pixelDimensions.x;
+				offset.y = int(pixelDimensions.y / 2);
+				break;
+
+			case BOTTOM_LEFT:
+				offset.y = pixelDimensions.y; 
+				break;
+
+			case BOTTOM_MIDDLE:
+				offset.x = int(pixelDimensions.x / 2);
+				offset.y = pixelDimensions.y;
+				break;
+
+			case BOTTOM_RIGHT:
+				offset.x = pixelDimensions.x;
+				offset.y = pixelDimensions.y;
+				break;
+
+			default:
+				break;
+			}
+
+			for (int y = 0; y < m_grid.size(); y++)
+			{
+				for (int x = 0; x < m_grid[y].size(); x++)
+				{
+					T_Entity entity = m_grid[y][x];
+					int xPos = (x * (entity.GetMarginWidth() + entity.GetWidth())) + position.x - offset.x;
+					int yPos = (y * (entity.GetMarginHeight() + entity.GetHeight())) + position.y - offset.y;
+
+					m_grid[y][x].SetPositionOnScreen(yPos, xPos);
 				}
 			}
 		}
-	}
+
+		void DisplayGrid() const
+		{
+
+			for (int y = 0; y < m_grid.size(); y++)
+			{
+				for (int x = 0; x < m_grid[y].size(); x++)
+				{
+					if (ShouldRenderEntity(IntVector2{ x, y }))
+					{
+						m_grid[y][x].Render();
+					}
+				}
+			}
+		}
+
+		virtual void ProcessMouseInput()
+		{
+
+		}
+	
+		std::vector<T_Entity> GetNeighbours(const T_Entity& tile) const
+		{
+			std::vector<T_Entity> neighbours;
+			int x = tile.GetCoords().x;
+			int y =	tile.GetCoords().y;
+
+			const int dx[] = { -1, -1, -1,  0, 0,  1, 1, 1 };
+			const int dy[] = { -1,  0,  1, -1, 1, -1, 0, 1 };
+
+			for (int i = 0; i < 8; ++i) 
+			{
+				int newX = x + dx[i];
+				int newY = y + dy[i];
+				if (newX >= 0 && newX < m_grid[0].size() &&
+					newY >= 0 && newY < m_grid.size()) 
+				{
+					neighbours.push_back(m_grid[newY][newX]);
+				}
+			}
+
+			return neighbours;
+		}
+	};
 };
