@@ -296,21 +296,18 @@ public:
 			int x = tile.GetCoords().x;
 			int y =	tile.GetCoords().y;
 
-			if ((y - 1) >= 0)
-			{
-				if ((x - 1) >= 0) neighbours.push_back(m_grid[y - 1][x - 1]);
-				neighbours.push_back(m_grid[y - 1][x]);
-				if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y - 1][x + 1]);
-			}
+			const int dx[] = { -1, -1, -1,  0, 0,  1, 1, 1 };
+			const int dy[] = { -1,  0,  1, -1, 1, -1, 0, 1 };
 
-			if ((x - 1) >= 0) neighbours.push_back(m_grid[y][x - 1]);
-			if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y][x + 1]);
-
-			if ((y + 1) < m_grid.size())
+			for (int i = 0; i < 8; ++i) 
 			{
-				if ((x - 1) >= 0) neighbours.push_back(m_grid[y + 1][x - 1]);
-				neighbours.push_back(m_grid[y + 1][x]);
-				if ((x + 1) < m_grid[0].size()) neighbours.push_back(m_grid[y + 1][x + 1]);
+				int newX = x + dx[i];
+				int newY = y + dy[i];
+				if (newX >= 0 && newX < m_grid[0].size() &&
+					newY >= 0 && newY < m_grid.size()) 
+				{
+					neighbours.push_back(m_grid[newY][newX]);
+				}
 			}
 
 			return neighbours;
