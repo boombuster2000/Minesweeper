@@ -3,6 +3,7 @@
 #include <vector>
 #include <random>
 #include <set>
+#include <string>
 
 class Minesweeper
 {
@@ -149,10 +150,10 @@ public:
 	
 		typedef std::vector<std::vector<Tile>> TileGrid;
 
-		float bombDensity = 0.15f;
-		int numberOfBombs;
-		int numberOfBombsLeft;
-		int numberOfFlagsLeft;
+		float m_bombDensity = 0.15f;
+		int m_numberOfBombs;
+		int m_numberOfBombsLeft;
+		int m_numberOfFlagsLeft;
 
 		bool m_isBombTriggered = false;
 
@@ -174,7 +175,7 @@ public:
 		void PlaceBombsOnBoard() {
 
 			std::set<std::pair<int, int>> bombCoordinates;
-			while (bombCoordinates.size() < numberOfBombs) {
+			while (bombCoordinates.size() < m_numberOfBombs) {
 				bombCoordinates.insert({
 					GenerateRandomInteger(0, m_grid[0].size() - 1),
 					GenerateRandomInteger(0, m_grid.size() - 1)
@@ -236,13 +237,13 @@ public:
 
 			if (tile.IsTileFlagged())
 			{
-				if (tile.GetContentOption() == Tile::ContentOption::BOMB) numberOfBombsLeft -= 1;
-				numberOfFlagsLeft -= 1;
+				if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft += 1;
+				m_numberOfFlagsLeft += 1;
 			}
 			else
 			{
-				if (tile.GetContentOption() == Tile::ContentOption::BOMB) numberOfBombsLeft += 1;
-				numberOfFlagsLeft += 1;
+				if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft -= 1;
+				m_numberOfFlagsLeft -= 1;
 			}
 			
 
@@ -272,9 +273,9 @@ public:
 		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::Grid<Tile>::AnchorPoints anchorPoint, const IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
 		{
-			numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * bombDensity);
-			numberOfBombsLeft = numberOfBombs;
-			numberOfFlagsLeft = numberOfBombs;
+			m_numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * m_bombDensity);
+			m_numberOfBombsLeft = m_numberOfBombs;
+			m_numberOfFlagsLeft = m_numberOfBombs;
 
 			PlaceBombsOnBoard();
 		}
@@ -303,6 +304,11 @@ public:
 		{
 			return m_isBombTriggered;
 		}
+
+		int GetNumberOfFlagsLeft() const
+		{
+			return m_numberOfFlagsLeft;
+		}
 	};
 };
 
@@ -326,6 +332,11 @@ int main()
 		ClearBackground(RAYWHITE);
 
 		game.DisplayGrid();
+
+		const int numberOfFlagsLeft = game.GetNumberOfFlagsLeft();
+		const std::string numberOfFlagsLeftString = std::to_string(numberOfFlagsLeft);
+		DrawText(numberOfFlagsLeftString.c_str(), GetScreenWidth() - 100, GetScreenHeight() - 100, 50, RED);
+
 		if (!game.IsBombTriggered())
 		{
 			game.ProcessMouseInput();
