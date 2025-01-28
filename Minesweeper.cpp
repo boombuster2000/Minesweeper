@@ -309,7 +309,12 @@ public:
 		{
 			return m_numberOfFlagsLeft;
 		}
-	};
+	
+		int GetNumberOfBombsLeft() const
+		{
+			return m_numberOfBombsLeft;
+		}
+};
 };
 
 int main()
@@ -337,7 +342,11 @@ int main()
 		const std::string numberOfFlagsLeftString = std::to_string(numberOfFlagsLeft);
 		DrawText(numberOfFlagsLeftString.c_str(), GetScreenWidth() - 100, GetScreenHeight() - 100, 50, RED);
 
-		if (!game.IsBombTriggered())
+		if (game.GetNumberOfBombsLeft() == 0)
+		{
+			DrawText("You found all the bombs!", 20, 10, 50, YELLOW);
+		}
+		else if (!game.IsBombTriggered())
 		{
 			game.ProcessMouseInput();
 		}
