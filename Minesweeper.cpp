@@ -151,6 +151,7 @@ public:
 	
 		typedef std::vector<std::vector<Tile>> TileGrid;
 
+		std::set<std::pair<int, int>> m_bombCoordinates;
 		float m_bombDensity = 0.15f;
 		int m_numberOfBombs;
 		int m_numberOfBombsLeft;
@@ -175,20 +176,20 @@ public:
 
 		void PlaceBombsOnBoard() {
 
-			std::set<std::pair<int, int>> bombCoordinates;
-			while (bombCoordinates.size() < m_numberOfBombs) {
-				bombCoordinates.insert({
+			
+			while (m_bombCoordinates.size() < m_numberOfBombs) {
+				m_bombCoordinates.insert({
 					GenerateRandomInteger(0, m_grid[0].size() - 1),
 					GenerateRandomInteger(0, m_grid.size() - 1)
 				});
 			}
 
-			for (const auto& [x, y] : bombCoordinates) {
+			for (const auto& [x, y] : m_bombCoordinates) {
 				m_grid[y][x].SetContentOption(Tile::ContentOption::BOMB);
 				m_grid[y][x].SetContentTextureFilePath("./resources/textures/bomb.png");
 			}
 
-			// Simplified number assignment
+			// Number assignment
 			for (int y = 0; y < m_grid.size(); y++) {
 				for (int x = 0; x < m_grid[0].size(); x++) {
 					if (m_grid[y][x].GetContentOption() != Tile::ContentOption::BOMB) {
@@ -316,6 +317,18 @@ public:
 		{
 			return m_numberOfBombsLeft;
 		}
+	
+		void ShowAllBombs()
+		{
+			for (const auto& [x, y] : m_bombCoordinates)
+			{
+				if (!m_grid[y][x].IsTileFlagged() && m_grid[y][x].IsTileCovered())
+				{
+					m_grid[y][x].SetTexture(m_grid[y][x].GetContentTextureFilePath());
+					m_grid[y][x].ToggleCovered();
+				}
+			}
+		}
 	};
 };
 
@@ -364,6 +377,7 @@ int main()
 		}
 		else
 		{
+			game.ShowAllBombs();
 			loseText.Render();
 		}
 
