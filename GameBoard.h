@@ -17,19 +17,101 @@ struct IntVector2
 class GameBoard
 {
 public:
+	const enum AnchorPoints
+	{
+		TOP_LEFT,
+		TOP_MIDDLE,
+		TOP_RIGHT,
+
+		MIDDLE_LEFT,
+		MIDDLE,
+		MIDDLE_RIGHT,
+
+		BOTTOM_LEFT,
+		BOTTOM_MIDDLE,
+		BOTTOM_RIGHT,
+	};
 
 	class Drawable
 	{
 	private:
-		Texture2D m_renderedTexture;
 		IntVector2 m_margin = { 0,0 };
 		IntVector2 m_dimensions = { 0,0 };
 		IntVector2 m_positionOnScreen = { 0,0 };
 		IntVector2 m_coords = { 0,0 };
 	
 	public:
-		Drawable(const char* textureFilePath, const IntVector2 dimensions, const IntVector2 margin)
-			: m_renderedTexture(LoadTexture(textureFilePath)), m_dimensions(dimensions), m_margin(margin)
+		Drawable(const IntVector2 dimensions, const IntVector2 margin)
+			: m_dimensions(dimensions), m_margin(margin)
+		{
+		}
+
+		virtual void Render() const = 0;
+
+		virtual int GetWidth() const
+		{
+			return m_dimensions.x;
+		}
+		virtual void SetWidth(const int width)
+		{
+			m_dimensions.x = width;
+		};
+
+		virtual int GetHeight() const
+		{
+			return m_dimensions.y;
+		}
+		virtual void SetHeight(const int height)
+		{
+			m_dimensions.y = height;
+		}
+
+		virtual int GetMarginWidth() const
+		{
+			return m_margin.x;
+		}
+		virtual void SetMarginWidth(const int marginWidth)
+		{
+			m_margin.x = marginWidth;
+		}
+
+		virtual int GetMarginHeight() const
+		{
+			return m_margin.y;
+		}
+		virtual void SetMarginHeight(const int marginHeight)
+		{
+			m_margin.y = marginHeight;
+		}
+
+		virtual void SetPositionOnScreen(const int y, const int x)
+		{
+			m_positionOnScreen = { x,y };
+		};
+		virtual IntVector2 GetPositionOnScreen() const
+		{
+			return m_positionOnScreen;
+		}
+	
+		virtual void SetGridCoords(const IntVector2 coords)
+		{
+			m_coords = coords;
+		}
+		virtual IntVector2 GetGridCoords() const
+		{
+			return m_coords;
+		}
+	};
+
+	class DrawableTexture : public Drawable
+	{
+	private:
+		Texture2D m_renderedTexture;
+
+	public:
+		DrawableTexture(const char* textureFilePath, const IntVector2 pixalDimensions, const IntVector2 margin)
+			:Drawable(pixalDimensions, margin),
+			m_renderedTexture(LoadTexture(textureFilePath))
 		{
 		}
 
@@ -42,79 +124,143 @@ public:
 		{
 			if (!FileExists(textureFilePath)) throw std::invalid_argument("File does not exist.");
 
-
 			m_renderedTexture = LoadTexture(textureFilePath);
 		}
 
-		virtual void Render() const
+		void Render() const override
 		{
 			IntVector2 positionOnScreen = GetPositionOnScreen();
-			float scaleY = m_dimensions.y / m_renderedTexture.height;
-			float scaleX = m_dimensions.x / m_renderedTexture.width;
+			float scaleY = GetHeight() / m_renderedTexture.height;
+			float scaleX = GetWidth() / m_renderedTexture.width;
 
 			float scale = std::min(scaleX, scaleY);
 
-			DrawTextureEx(m_renderedTexture, {(float)positionOnScreen.x, (float)positionOnScreen.y}, 0, scale, WHITE);
+			DrawTextureEx(m_renderedTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
 		};
+	};
 
-		int GetWidth() const
-		{
-			return m_dimensions.x;
-		}
-
-		void SetWidth(const int width)
-		{
-			m_dimensions.x = width;
-		};
-
-		int GetHeight() const
-		{
-			return m_dimensions.y;
-		}
+	class Text : public Drawable
+	{
+	private:
+		std::string m_text;
+		int m_fontSize;
+		Font m_font = GetFontDefault();
+		Color m_colour;
+		IntVector2 m_positionOnScreen = { 0,0 };
+		AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 		
-		void SetHeight(const int height)
+	public:
+
+		Text(std::string text, int fontSize, Color colour)
+			:Drawable(IntVector2{ MeasureText(text.c_str(), fontSize), 10 }, IntVector2{0,0}),
+			m_text(text), m_fontSize(fontSize), m_colour(colour)
 		{
-			m_dimensions.y = height;
 		}
 
-		int GetMarginWidth() const
+		std::string GetText() const
 		{
-			return m_margin.x;
+			return m_text;
+		}
+		void SetText(const std::string text)
+		{
+			m_text = text;
 		}
 
-		void SetMarginWidth(const int marginWidth)
+		int GetFontSize() const
 		{
-			m_margin.x = marginWidth;
+			return m_fontSize;
+		}
+		void SetFontSize(const int fontSize)
+		{
+			m_fontSize = fontSize;
 		}
 
-		int GetMarginHeight() const
+		int GetWidth() const override
 		{
-			return m_margin.y;
+			return MeasureTextEx(m_font, m_text.c_str(), m_fontSize, 0).x;
 		}
 
-		void SetMarginHeight(const int marginHeight)
+		int GetHeight() const override
 		{
-			m_margin.y = marginHeight;
+			return MeasureTextEx(m_font, m_text.c_str(), m_fontSize, 0).y;
 		}
 
-		void SetPositionOnScreen(const int y, const int x)
+		AnchorPoints GetAnchorPoint() const
 		{
+			return m_anchorPoint;
+		}
+		void SetAnchorPoint(const AnchorPoints anchorpoint)
+		{
+			m_anchorPoint = anchorpoint;
+			SetPositionOnScreen(m_positionOnScreen.x, m_positionOnScreen.y);
+		}
+
+		void SetPositionOnScreen(int x, int y) override
+		{
+			const int height = GetHeight();
+			const int width = GetWidth();
+			IntVector2 offset = { 0,0 };
+
+			switch (m_anchorPoint)
+			{
+			case GameBoard::TOP_MIDDLE:
+				offset.x = width / 2;
+				break;
+
+			case GameBoard::TOP_RIGHT:
+				offset.x = width;
+				break;
+
+			case GameBoard::MIDDLE_LEFT:
+				offset.y = height / 2;
+				break;
+
+			case GameBoard::MIDDLE:
+				offset.x = width / 2;
+				offset.y = height / 2;
+				break;
+
+			case GameBoard::MIDDLE_RIGHT:
+				offset.x = width;
+				offset.y = height / 2;
+				break;
+
+			case GameBoard::BOTTOM_LEFT:
+				offset.y = height;
+				break;
+
+			case GameBoard::BOTTOM_MIDDLE:
+				offset.x = height / 2;
+				offset.y = height;
+				break;
+
+			case GameBoard::BOTTOM_RIGHT:
+				offset.x = width;
+				offset.y = height;
+				break;
+
+			default:
+				break;
+			}
+		
+			x -= offset.x;
+			y -= offset.y;
+
 			m_positionOnScreen = { x,y };
-		};
+		}
 
-		IntVector2 GetPositionOnScreen() const
+		Color GetColour() const
 		{
-			return m_positionOnScreen;
+			return m_colour;
+		}
+		void SetColour(const Color colour)
+		{
+			m_colour = colour;
 		}
 	
-		void SetCoords(const IntVector2 coords)
+		void Render() const override
 		{
-			m_coords = coords;
-		}
-
-		IntVector2 GetCoords() const
-		{
-			return m_coords;
+			DrawText(m_text.c_str(), m_positionOnScreen.x, m_positionOnScreen.y, m_fontSize, m_colour);
 		}
 	};
 
@@ -122,23 +268,6 @@ public:
 	class Grid
 	{
 		
-	public:
-
-		const enum AnchorPoints
-		{
-			TOP_LEFT,
-			TOP_MIDDLE,
-			TOP_RIGHT,
-
-			MIDDLE_LEFT,
-			MIDDLE,
-			MIDDLE_RIGHT,
-
-			BOTTOM_LEFT,
-			BOTTOM_MIDDLE,
-			BOTTOM_RIGHT,
-		};
-
 	protected:
 
 		AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
@@ -175,7 +304,7 @@ public:
 
 				for (int x = 0; x < dimensions.x; x++)
 				{
-					sampleSquare.SetCoords(IntVector2{ x, y });
+					sampleSquare.SetGridCoords(IntVector2{ x, y });
 					row.push_back(sampleSquare);
 				}
 
@@ -293,8 +422,8 @@ public:
 		std::vector<T_Entity> GetNeighbours(const T_Entity& tile) const
 		{
 			std::vector<T_Entity> neighbours;
-			int x = tile.GetCoords().x;
-			int y =	tile.GetCoords().y;
+			int x = tile.GetGridCoords().x;
+			int y =	tile.GetGridCoords().y;
 
 			const int dx[] = { -1, -1, -1,  0, 0,  1, 1, 1 };
 			const int dy[] = { -1,  0,  1, -1, 1, -1, 0, 1 };
