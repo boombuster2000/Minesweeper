@@ -10,7 +10,7 @@ class Minesweeper
 	
 
 public:
-	class Tile : public GameBoard::Drawable
+	class Tile : public GameBoard::DrawableTexture
 	{
 
 	public:
@@ -55,7 +55,7 @@ public:
 
 	public:
 		Tile(const IntVector2 dimensions, const IntVector2 margin)
-			:Drawable("./resources/textures/covered-tile.png", dimensions, margin)
+			:DrawableTexture("./resources/textures/covered-tile.png", dimensions, margin)
 		{
 		}
 		
@@ -141,6 +141,7 @@ public:
 			}
 		}
 
+
 	};
 	
 	class MinesweeperGrid : public GameBoard::Grid<Tile> 
@@ -208,7 +209,7 @@ public:
 				if (neighbour.GetContentOption() == Tile::ContentOption::BOMB) continue;
 				if (!neighbour.IsTileCovered()) continue;
 				
-				IntVector2 coords = neighbour.GetCoords();
+				IntVector2 coords = neighbour.GetGridCoords();
 				Tile& tile = m_grid[coords.y][coords.x];
 
 				tile.SetTexture(neighbour.GetContentTextureFilePath());
@@ -242,6 +243,7 @@ public:
 			}
 			else
 			{
+				if (m_numberOfFlagsLeft <= 0) return;
 				if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft -= 1;
 				m_numberOfFlagsLeft -= 1;
 			}
@@ -270,7 +272,7 @@ public:
 		}
 
 	public:
-		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::Grid<Tile>::AnchorPoints anchorPoint, const IntVector2 position)
+		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::AnchorPoints anchorPoint, const IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
 		{
 			m_numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * m_bombDensity);
@@ -314,7 +316,7 @@ public:
 		{
 			return m_numberOfBombsLeft;
 		}
-};
+	};
 };
 
 int main()
@@ -327,9 +329,19 @@ int main()
 	Minesweeper::MinesweeperGrid game(
 		IntVector2{ 9,9 }, 
 		sampleTile, 
-		GameBoard::Grid<Minesweeper::Tile>::AnchorPoints::MIDDLE,
+		GameBoard::AnchorPoints::MIDDLE,
 		IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
 	);
+
+	GameBoard::Text flagsLeft("Flags Left: 0", 20, RED);
+	flagsLeft.SetPositionOnScreen(GetScreenWidth()-170, 80);
+
+	GameBoard::Text winText("You found all the bombs!", 50, YELLOW);
+	winText.SetAnchorPoint(GameBoard::AnchorPoints::MIDDLE);
+	winText.SetPositionOnScreen(10, 10);
+
+	GameBoard::Text loseText("You triggered a bomb!", 50, YELLOW);
+	loseText.SetPositionOnScreen(10, 10);
 
 	while (!WindowShouldClose())
 	{
@@ -339,12 +351,12 @@ int main()
 		game.DisplayGrid();
 
 		const int numberOfFlagsLeft = game.GetNumberOfFlagsLeft();
-		const std::string numberOfFlagsLeftString = std::to_string(numberOfFlagsLeft);
-		DrawText(numberOfFlagsLeftString.c_str(), GetScreenWidth() - 100, GetScreenHeight() - 100, 50, RED);
+		flagsLeft.SetText(TextFormat("Flags Left: %d", numberOfFlagsLeft));
+		flagsLeft.Render();
 
 		if (game.GetNumberOfBombsLeft() == 0)
 		{
-			DrawText("You found all the bombs!", 20, 10, 50, YELLOW);
+			winText.Render();
 		}
 		else if (!game.IsBombTriggered())
 		{
@@ -352,7 +364,7 @@ int main()
 		}
 		else
 		{
-			DrawText("You triggered a bomb!", 20, 10, 50, YELLOW);
+			loseText.Render();
 		}
 
 		EndDrawing();
