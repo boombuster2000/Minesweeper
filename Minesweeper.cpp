@@ -355,65 +355,76 @@ int main()
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
-	Minesweeper::MinesweeperGrid game(
-		IntVector2{ 9,9 }, 
-		sampleTile, 
-		GameBoard::AnchorPoints::MIDDLE,
-		IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
-	);
-
 	GameBoard::Text flagsLeft("Flags Left: 0", 20, RED);
 	flagsLeft.SetPositionOnScreen(GetScreenWidth()-170, 80);
 
-	GameBoard::Text winText("You found all the bombs!", 50, YELLOW);
+	GameBoard::Text winText("You found all the bombs!", 50, BLUE);
 	winText.SetAnchorPoint(GameBoard::AnchorPoints::MIDDLE);
 	winText.SetPositionOnScreen(10, 10);
 
-	GameBoard::Text loseText("You triggered a bomb!", 50, YELLOW);
+	GameBoard::Text loseText("You triggered a bomb!", 50, BLUE);
 	loseText.SetPositionOnScreen(10, 10);
 
-	GameBoard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, YELLOW);
-	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 100);
+	GameBoard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE);
+	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
 
 	bool shouldPlayAgain = true;
 
 	while (!WindowShouldClose() || shouldPlayAgain)
 	{
-		BeginDrawing();
-		ClearBackground(RAYWHITE);
+		Minesweeper::MinesweeperGrid game(
+			IntVector2{ 9,9 },
+			sampleTile,
+			GameBoard::AnchorPoints::MIDDLE,
+			IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
+		);
 
-		game.DisplayGrid();
-
-		const int numberOfFlagsLeft = game.GetNumberOfFlagsLeft();
-		flagsLeft.SetText(TextFormat("Flags Left: %d", numberOfFlagsLeft));
-		flagsLeft.Render();
-
-		if (game.GetNumberOfBombsLeft() == 0)
+		// MAIN GAME LOOP
+		while (true)
 		{
-			winText.Render();
-			playAgainText.Render();
-		}
-		else if (!game.IsBombTriggered())
-		{
-			game.ProcessMouseInput();
-		}
-		else
-		{
-			loseText.Render();
-			playAgainText.Render();
-			game.DisplayBombs();
-			
-			if (IsKeyPressed(KEY_ENTER))
+			if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
 			{
-				
-			}
-			else if (IsKeyPressed(KEY_ESCAPE))
-			{
+				shouldPlayAgain = false;
 				break;
 			}
-		}
 
-		EndDrawing();
+			BeginDrawing();
+			ClearBackground(RAYWHITE);
+
+			game.DisplayGrid();
+
+			const int numberOfFlagsLeft = game.GetNumberOfFlagsLeft();
+			flagsLeft.SetText(TextFormat("Flags Left: %d", numberOfFlagsLeft));
+			flagsLeft.Render();
+
+
+			if (!game.IsBombTriggered())
+			{
+				game.ProcessMouseInput();
+			}
+			else
+			{
+				playAgainText.Render();
+				if (IsKeyPressed(KEY_ENTER))
+				{
+					break;
+				}
+
+				if (game.GetNumberOfBombsLeft() == 0)
+				{
+					winText.Render();
+
+				}
+				else
+				{
+					loseText.Render();
+					game.DisplayBombs();
+
+				}
+			}
+
+			EndDrawing();
+		}
 	}
 
 	CloseWindow();
