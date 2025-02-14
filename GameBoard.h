@@ -230,7 +230,7 @@ public:
 				break;
 
 			case GameBoard::BOTTOM_MIDDLE:
-				offset.x = height / 2;
+				offset.x = width / 2;
 				offset.y = height;
 				break;
 
