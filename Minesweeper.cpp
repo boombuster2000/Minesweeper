@@ -372,7 +372,12 @@ int main()
 	GameBoard::Text loseText("You triggered a bomb!", 50, YELLOW);
 	loseText.SetPositionOnScreen(10, 10);
 
-	while (!WindowShouldClose())
+	GameBoard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, YELLOW);
+	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 100);
+
+	bool shouldPlayAgain = true;
+
+	while (!WindowShouldClose() || shouldPlayAgain)
 	{
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
@@ -386,6 +391,7 @@ int main()
 		if (game.GetNumberOfBombsLeft() == 0)
 		{
 			winText.Render();
+			playAgainText.Render();
 		}
 		else if (!game.IsBombTriggered())
 		{
@@ -394,7 +400,17 @@ int main()
 		else
 		{
 			loseText.Render();
+			playAgainText.Render();
 			game.DisplayBombs();
+			
+			if (IsKeyPressed(KEY_ENTER))
+			{
+				
+			}
+			else if (IsKeyPressed(KEY_ESCAPE))
+			{
+				break;
+			}
 		}
 
 		EndDrawing();
