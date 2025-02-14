@@ -150,6 +150,7 @@ public:
 	private:
 	
 		typedef std::vector<std::vector<Tile>> TileGrid;
+		std::set<std::pair<int, int>> bombCoordinates;
 
 		float m_bombDensity = 0.15f;
 		int m_numberOfBombs;
@@ -175,7 +176,6 @@ public:
 
 		void PlaceBombsOnBoard() {
 
-			std::set<std::pair<int, int>> bombCoordinates;
 			while (bombCoordinates.size() < m_numberOfBombs) {
 				bombCoordinates.insert({
 					GenerateRandomInteger(0, m_grid[0].size() - 1),
@@ -316,6 +316,15 @@ public:
 		{
 			return m_numberOfBombsLeft;
 		}
+	
+		void DisplayBombs()
+		{
+			for (const auto& [x, y] : bombCoordinates) {
+				if (!m_grid[y][x].IsTileCovered()) continue;
+				m_grid[y][x].SetTexture(m_grid[y][x].GetContentTextureFilePath());
+				m_grid[y][x].ToggleCovered();
+			}
+		}
 	};
 };
 
@@ -365,6 +374,7 @@ int main()
 		else
 		{
 			loseText.Render();
+			game.DisplayBombs();
 		}
 
 		EndDrawing();
