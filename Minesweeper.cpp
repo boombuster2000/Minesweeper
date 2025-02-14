@@ -35,6 +35,7 @@ public:
 			const char* coveredTile = "./resources/textures/covered-tile.png";
 			const char* emptyTile = "./resources/textures/empty-tile.png";
 			const char* flag = "./resources/textures/flag.png";
+			const char* incorrect = "./resources/textures/incorrect.png";
 			const char* one = "./resources/textures/one.png";
 			const char* two = "./resources/textures/two.png";
 			const char* three = "./resources/textures/three.png";
