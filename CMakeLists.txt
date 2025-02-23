@@ -31,7 +31,13 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Minesweeper PROPERTY CXX_STANDARD 20)
 endif()
 
-file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}")
+#file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/resources"
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"
+)
+
 target_link_libraries(${PROJECT_NAME} raylib)
 
 # TODO: Add tests and install targets if needed.

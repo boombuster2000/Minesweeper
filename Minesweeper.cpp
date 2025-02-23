@@ -3,13 +3,14 @@
 #include <vector>
 #include <random>
 #include <set>
+#include <string>
 
 class Minesweeper
 {
 	
 
 public:
-	class Tile : public GameBoard::Drawable
+	class Tile : public GameBoard::DrawableTexture
 	{
 
 	public:
@@ -34,6 +35,7 @@ public:
 			const char* coveredTile = "./resources/textures/covered-tile.png";
 			const char* emptyTile = "./resources/textures/empty-tile.png";
 			const char* flag = "./resources/textures/flag.png";
+			const char* incorrect = "./resources/textures/incorrect.png";
 			const char* one = "./resources/textures/one.png";
 			const char* two = "./resources/textures/two.png";
 			const char* three = "./resources/textures/three.png";
@@ -54,7 +56,7 @@ public:
 
 	public:
 		Tile(const IntVector2 dimensions, const IntVector2 margin)
-			:Drawable("./resources/textures/covered-tile.png", dimensions, margin)
+			:DrawableTexture("./resources/textures/covered-tile.png", dimensions, margin)
 		{
 		}
 		
@@ -140,12 +142,22 @@ public:
 			}
 		}
 
+
 	};
 	
 	class MinesweeperGrid : public GameBoard::Grid<Tile> 
 	{
+
+	private:
 	
 		typedef std::vector<std::vector<Tile>> TileGrid;
+		std::set<std::pair<int, int>> m_bombCoordinates;
+
+		float m_bombDensity = 0.15f;
+		int m_numberOfBombs;
+		int m_numberOfBombsLeft;
+		int m_numberOfFlagsLeft;
+
 		bool m_isBombTriggered = false;
 
 	private:
@@ -164,18 +176,15 @@ public:
 		}
 
 		void PlaceBombsOnBoard() {
-			const float BOMB_DENSITY = 0.15f; // 15% of tiles are bombs
-			const int numberOfBombs = static_cast<int>(m_grid.size() * m_grid[0].size() * BOMB_DENSITY);
 
-			std::set<std::pair<int, int>> bombCoordinates;
-			while (bombCoordinates.size() < numberOfBombs) {
-				bombCoordinates.insert({
+			while (m_bombCoordinates.size() < m_numberOfBombs) {
+				m_bombCoordinates.insert({
 					GenerateRandomInteger(0, m_grid[0].size() - 1),
 					GenerateRandomInteger(0, m_grid.size() - 1)
 				});
 			}
 
-			for (const auto& [x, y] : bombCoordinates) {
+			for (const auto& [x, y] : m_bombCoordinates) {
 				m_grid[y][x].SetContentOption(Tile::ContentOption::BOMB);
 				m_grid[y][x].SetContentTextureFilePath("./resources/textures/bomb.png");
 			}
@@ -201,7 +210,7 @@ public:
 				if (neighbour.GetContentOption() == Tile::ContentOption::BOMB) continue;
 				if (!neighbour.IsTileCovered()) continue;
 				
-				IntVector2 coords = neighbour.GetCoords();
+				IntVector2 coords = neighbour.GetGridCoords();
 				Tile& tile = m_grid[coords.y][coords.x];
 
 				tile.SetTexture(neighbour.GetContentTextureFilePath());
@@ -226,9 +235,23 @@ public:
 		}
 
 		void HandleRightClick(Tile& tile) {
-			if (tile.IsTileCovered()) {
-				tile.ToggleFlag();	
+			if (!tile.IsTileCovered()) return;
+
+			if (tile.IsTileFlagged())
+			{
+				if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft += 1;
+				m_numberOfFlagsLeft += 1;
 			}
+			else
+			{
+				if (m_numberOfFlagsLeft <= 0) return;
+				if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft -= 1;
+				m_numberOfFlagsLeft -= 1;	
+			}
+			
+
+			tile.ToggleFlag();
+			
 		}
 
 		void HandleLeftClick(Tile& tile) {
@@ -250,9 +273,13 @@ public:
 		}
 
 	public:
-		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::Grid<Tile>::AnchorPoints anchorPoint, const IntVector2 position)
+		MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const GameBoard::AnchorPoints anchorPoint, const IntVector2 position)
 			: Grid(dimensions, sampleTile, anchorPoint, position)
 		{
+			m_numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * m_bombDensity);
+			m_numberOfBombsLeft = m_numberOfBombs;
+			m_numberOfFlagsLeft = m_numberOfBombs;
+
 			PlaceBombsOnBoard();
 		}
 
@@ -280,6 +307,44 @@ public:
 		{
 			return m_isBombTriggered;
 		}
+
+		int GetNumberOfFlagsLeft() const
+		{
+			return m_numberOfFlagsLeft;
+		}
+	
+		int GetNumberOfBombsLeft() const
+		{
+			return m_numberOfBombsLeft;
+		}
+	
+		void DisplayBombs()
+		{
+			for (const auto& [x, y] : m_bombCoordinates) {
+				if (m_grid[y][x].IsTileFlagged() && m_grid[y][x].GetContentOption() == Tile::ContentOption::BOMB) continue;
+				if (!m_grid[y][x].IsTileCovered()) continue;
+				m_grid[y][x].SetTexture(m_grid[y][x].GetContentTextureFilePath());
+				m_grid[y][x].ToggleCovered();
+			}
+			
+
+			for (auto& row : m_grid)
+			{
+				for (auto& tile : row)
+				{
+					int x = tile.GetGridCoords().x;
+					int y = tile.GetGridCoords().y;
+
+					if (!tile.IsTileFlagged()) continue;
+					if (tile.GetContentOption() == Tile::ContentOption::BOMB) continue;
+
+					m_grid[y][x].SetTexture("./resources/textures/incorrect.png");
+					m_grid[y][x].ToggleFlag();
+				}
+			}
+
+			m_bombCoordinates.clear();
+		}
 	};
 };
 
@@ -290,29 +355,76 @@ int main()
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
-	Minesweeper::MinesweeperGrid game(
-		IntVector2{ 9,9 }, 
-		sampleTile, 
-		GameBoard::Grid<Minesweeper::Tile>::AnchorPoints::MIDDLE,
-		IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
-	);
+	GameBoard::Text flagsLeft("Flags Left: 0", 20, RED);
+	flagsLeft.SetPositionOnScreen(GetScreenWidth()-170, 80);
 
-	while (!WindowShouldClose())
+	GameBoard::Text winText("You found all the bombs!", 50, BLUE);
+	winText.SetAnchorPoint(GameBoard::AnchorPoints::MIDDLE);
+	winText.SetPositionOnScreen(10, 10);
+
+	GameBoard::Text loseText("You triggered a bomb!", 50, BLUE);
+	loseText.SetPositionOnScreen(10, 10);
+
+	GameBoard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE);
+	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
+
+	bool shouldPlayAgain = true;
+
+	while (!WindowShouldClose() || shouldPlayAgain)
 	{
-		BeginDrawing();
-		ClearBackground(RAYWHITE);
+		Minesweeper::MinesweeperGrid game(
+			IntVector2{ 9,9 },
+			sampleTile,
+			GameBoard::AnchorPoints::MIDDLE,
+			IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
+		);
 
-		game.DisplayGrid();
-		if (!game.IsBombTriggered())
+		// MAIN GAME LOOP
+		while (true)
 		{
-			game.ProcessMouseInput();
-		}
-		else
-		{
-			DrawText("You triggered a bomb!", 20, 10, 50, YELLOW);
-		}
+			if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
+			{
+				shouldPlayAgain = false;
+				break;
+			}
 
-		EndDrawing();
+			BeginDrawing();
+			ClearBackground(RAYWHITE);
+
+			game.DisplayGrid();
+
+			const int numberOfFlagsLeft = game.GetNumberOfFlagsLeft();
+			flagsLeft.SetText(TextFormat("Flags Left: %d", numberOfFlagsLeft));
+			flagsLeft.Render();
+
+
+			if (!game.IsBombTriggered())
+			{
+				game.ProcessMouseInput();
+			}
+			else
+			{
+				playAgainText.Render();
+				if (IsKeyPressed(KEY_ENTER))
+				{
+					break;
+				}
+
+				if (game.GetNumberOfBombsLeft() == 0)
+				{
+					winText.Render();
+
+				}
+				else
+				{
+					loseText.Render();
+					game.DisplayBombs();
+
+				}
+			}
+
+			EndDrawing();
+		}
 	}
 
 	CloseWindow();
