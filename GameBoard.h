@@ -84,7 +84,7 @@ public:
 			m_margin.y = marginHeight;
 		}
 
-		virtual void SetPositionOnScreen(const int y, const int x)
+		virtual void SetPositionOnScreen(const int x, const int y)
 		{
 			m_positionOnScreen = { x,y };
 		};
@@ -394,7 +394,7 @@ public:
 					int xPos = (x * (entity.GetMarginWidth() + entity.GetWidth())) + position.x - offset.x;
 					int yPos = (y * (entity.GetMarginHeight() + entity.GetHeight())) + position.y - offset.y;
 
-					m_grid[y][x].SetPositionOnScreen(yPos, xPos);
+					m_grid[y][x].SetPositionOnScreen(xPos, yPos);
 				}
 			}
 		}
