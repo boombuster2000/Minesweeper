@@ -34,7 +34,7 @@ This project uses CMake for building and is **dependent on the Raylib library, w
 ## Running the Game
 After building, the executable can be found in the build directory. Run it with:
    ```sh
-   ./minesweeper
+   ./minesweeper.exe
    ```
 
 Enjoy the game!
