@@ -1,6 +1,6 @@
 # Minesweeper
 
-A simple Minesweeper game built in C++.
+A simple Minesweeper game built in C++ using the **Raylib library**.
 
 ## Controls
 - **Left Click** - Uncover a tile
@@ -8,7 +8,7 @@ A simple Minesweeper game built in C++.
 - **ESC** - Exit the game
 
 ## Building the Project
-This project uses CMake for building and is dependent on the Raylib library, which CMake downloads automatically. To build the project, follow these steps:
+This project uses CMake for building and is **dependent on the Raylib library, which CMake downloads automatically**. To build the project, follow these steps:
 
 1. Navigate to the project directory:
    ```sh
