@@ -82,7 +82,7 @@ void Tile::ToggleFlag()
 void Tile::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
-    float scale = GetHeight() / GetTexture().height;
+    float scale = (float)GetHeight() / GetTexture().height;
 
     DrawTextureEx(GetTexture(), { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
 

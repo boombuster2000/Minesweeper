@@ -32,7 +32,7 @@ namespace Gameboard
 
     class Drawable
     {
-    private:
+    protected:
         IntVector2 m_margin = { 0,0 };
         IntVector2 m_dimensions = { 0,0 };
         IntVector2 m_positionOnScreen = { 0,0 };
@@ -83,7 +83,6 @@ namespace Gameboard
         int m_fontSize;
         Font m_font = GetFontDefault();
         Color m_colour;
-        IntVector2 m_positionOnScreen = { 0,0 };
         AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
     public:

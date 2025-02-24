@@ -143,7 +143,8 @@ AnchorPoints Text::GetAnchorPoint() const
 void Text::SetAnchorPoint(const AnchorPoints anchorpoint)
 {
     m_anchorPoint = anchorpoint;
-    SetPositionOnScreen(m_positionOnScreen.x, m_positionOnScreen.y);
+    IntVector2 positionOnScreen = GetPositionOnScreen();
+    SetPositionOnScreen(positionOnScreen.x, positionOnScreen.y);
 }
 
 void Text::SetPositionOnScreen(int x, int y)
@@ -197,7 +198,7 @@ void Text::SetPositionOnScreen(int x, int y)
     x -= offset.x;
     y -= offset.y;
 
-    m_positionOnScreen = { x,y };
+    m_positionOnScreen = { x, y };
 }
 
 Color Text::GetColour() const
@@ -212,5 +213,6 @@ void Text::SetColour(const Color colour)
 
 void Text::Render() const
 {
-    DrawText(m_text.c_str(), m_positionOnScreen.x, m_positionOnScreen.y, m_fontSize, m_colour);
+    IntVector2 positionOnScreen = GetPositionOnScreen();
+    DrawText(m_text.c_str(), positionOnScreen.x, positionOnScreen.y, m_fontSize, m_colour);
 }
