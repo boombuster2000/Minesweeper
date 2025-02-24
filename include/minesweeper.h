@@ -7,9 +7,8 @@
 #include <set>
 #include <string>
 
-class Minesweeper
+namespace Minesweeper
 {
-public:
     class Tile : public Gameboard::DrawableTexture
     {
     public:

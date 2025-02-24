@@ -12,9 +12,9 @@ struct IntVector2
     bool operator==(const IntVector2& other) const;
 };
 
-class Gameboard
+namespace Gameboard
 {
-public:
+
     enum AnchorPoints
     {
         TOP_LEFT,
