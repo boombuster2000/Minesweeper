@@ -1,16 +1,17 @@
 #include "minesweeper.h"
+using namespace Minesweeper;
 
-Minesweeper::Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
+Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
     : DrawableTexture("./resources/textures/covered-tile.png", dimensions, margin)
 {
 }
 
-Minesweeper::Tile::ContentOption Minesweeper::Tile::GetContentOption() const
+Tile::ContentOption Tile::GetContentOption() const
 {
     return m_entityOption;
 }
 
-void Minesweeper::Tile::SetContentOption(ContentOption contentOption)
+void Tile::SetContentOption(ContentOption contentOption)
 {
     m_entityOption = contentOption;
 
@@ -48,37 +49,37 @@ void Minesweeper::Tile::SetContentOption(ContentOption contentOption)
     }
 }
 
-const char* Minesweeper::Tile::GetContentTextureFilePath() const
+const char* Tile::GetContentTextureFilePath() const
 {
     return m_contentTextureFilePath;
 }
 
-void Minesweeper::Tile::SetContentTextureFilePath(const char* textureFilePath)
+void Tile::SetContentTextureFilePath(const char* textureFilePath)
 {
     m_contentTextureFilePath = textureFilePath;
 }
 
-bool Minesweeper::Tile::IsTileCovered() const
+bool Tile::IsTileCovered() const
 {
     return m_isCovered;
 }
 
-void Minesweeper::Tile::ToggleCovered()
+void Tile::ToggleCovered()
 {
     m_isCovered = !m_isCovered;
 }
 
-bool Minesweeper::Tile::IsTileFlagged() const
+bool Tile::IsTileFlagged() const
 {
     return m_isFlagged;
 }
 
-void Minesweeper::Tile::ToggleFlag()
+void Tile::ToggleFlag()
 {
     m_isFlagged = !m_isFlagged;
 }
 
-void Minesweeper::Tile::Render() const
+void Tile::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
     float scale = GetHeight() / GetTexture().height;
@@ -91,7 +92,7 @@ void Minesweeper::Tile::Render() const
     }
 }
 
-Minesweeper::MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position)
+MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position)
     : Grid(dimensions, sampleTile, anchorPoint, position)
 {
     m_numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * m_bombDensity);
@@ -101,7 +102,7 @@ Minesweeper::MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const
     PlaceBombsOnBoard();
 }
 
-int Minesweeper::MinesweeperGrid::GetNumberOfBombsAroundTile(const Tile& tile) const
+int MinesweeperGrid::GetNumberOfBombsAroundTile(const Tile& tile) const
 {
     int count = 0;
     const std::vector<Tile> neighbours = GetNeighbours(tile);
@@ -114,7 +115,7 @@ int Minesweeper::MinesweeperGrid::GetNumberOfBombsAroundTile(const Tile& tile) c
     return count;
 }
 
-void Minesweeper::MinesweeperGrid::PlaceBombsOnBoard()
+void MinesweeperGrid::PlaceBombsOnBoard()
 {
     while (m_bombCoordinates.size() < m_numberOfBombs) {
         m_bombCoordinates.insert({
@@ -139,7 +140,7 @@ void Minesweeper::MinesweeperGrid::PlaceBombsOnBoard()
     }
 }
 
-void Minesweeper::MinesweeperGrid::ClearEmptyNeighbours(const Tile& homeTile)
+void MinesweeperGrid::ClearEmptyNeighbours(const Tile& homeTile)
 {
     std::vector<Tile> neighbours = GetNeighbours(homeTile);
     std::vector<Tile> clearedNeighbours;
@@ -165,7 +166,7 @@ void Minesweeper::MinesweeperGrid::ClearEmptyNeighbours(const Tile& homeTile)
     }
 }
 
-bool Minesweeper::MinesweeperGrid::IsTileUnderMouse(const Tile& tile, const Vector2& mousePosition) const
+bool MinesweeperGrid::IsTileUnderMouse(const Tile& tile, const Vector2& mousePosition) const
 {
     const IntVector2 pos = tile.GetPositionOnScreen();
     return
@@ -173,7 +174,7 @@ bool Minesweeper::MinesweeperGrid::IsTileUnderMouse(const Tile& tile, const Vect
         pos.y < mousePosition.y && pos.y + tile.GetHeight() > mousePosition.y;
 }
 
-void Minesweeper::MinesweeperGrid::HandleRightClick(Tile& tile)
+void MinesweeperGrid::HandleRightClick(Tile& tile)
 {
     if (!tile.IsTileCovered()) return;
 
@@ -192,7 +193,7 @@ void Minesweeper::MinesweeperGrid::HandleRightClick(Tile& tile)
     tile.ToggleFlag();
 }
 
-void Minesweeper::MinesweeperGrid::HandleLeftClick(Tile& tile)
+void MinesweeperGrid::HandleLeftClick(Tile& tile)
 {
     if (!tile.IsTileCovered() || tile.IsTileFlagged()) return;
 
@@ -211,7 +212,7 @@ void Minesweeper::MinesweeperGrid::HandleLeftClick(Tile& tile)
     }
 }
 
-void Minesweeper::MinesweeperGrid::ProcessMouseInput()
+void MinesweeperGrid::ProcessMouseInput()
 {
     if (!(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))) return;
 
@@ -231,22 +232,22 @@ void Minesweeper::MinesweeperGrid::ProcessMouseInput()
     }
 }
 
-bool Minesweeper::MinesweeperGrid::IsBombTriggered() const
+bool MinesweeperGrid::IsBombTriggered() const
 {
     return m_isBombTriggered;
 }
 
-int Minesweeper::MinesweeperGrid::GetNumberOfFlagsLeft() const
+int MinesweeperGrid::GetNumberOfFlagsLeft() const
 {
     return m_numberOfFlagsLeft;
 }
 
-int Minesweeper::MinesweeperGrid::GetNumberOfBombsLeft() const
+int MinesweeperGrid::GetNumberOfBombsLeft() const
 {
     return m_numberOfBombsLeft;
 }
 
-void Minesweeper::MinesweeperGrid::DisplayBombs()
+void MinesweeperGrid::DisplayBombs()
 {
     for (const auto& [x, y] : m_bombCoordinates) {
         if (m_grid[y][x].IsTileFlagged() && m_grid[y][x].GetContentOption() == Tile::ContentOption::BOMB) continue;

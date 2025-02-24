@@ -1,93 +1,94 @@
 #include "gameboard.h"
+using namespace Gameboard;
 
 bool IntVector2::operator==(const IntVector2& other) const
 {
     return x == other.x && y == other.y;
 }
 
-Gameboard::Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
+Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
     : m_dimensions(dimensions), m_margin(margin)
 {
 }
 
-int Gameboard::Drawable::GetWidth() const
+int Drawable::GetWidth() const
 {
     return m_dimensions.x;
 }
 
-void Gameboard::Drawable::SetWidth(const int width)
+void Drawable::SetWidth(const int width)
 {
     m_dimensions.x = width;
 }
 
-int Gameboard::Drawable::GetHeight() const
+int Drawable::GetHeight() const
 {
     return m_dimensions.y;
 }
 
-void Gameboard::Drawable::SetHeight(const int height)
+void Drawable::SetHeight(const int height)
 {
     m_dimensions.y = height;
 }
 
-int Gameboard::Drawable::GetMarginWidth() const
+int Drawable::GetMarginWidth() const
 {
     return m_margin.x;
 }
 
-void Gameboard::Drawable::SetMarginWidth(const int marginWidth)
+void Drawable::SetMarginWidth(const int marginWidth)
 {
     m_margin.x = marginWidth;
 }
 
-int Gameboard::Drawable::GetMarginHeight() const
+int Drawable::GetMarginHeight() const
 {
     return m_margin.y;
 }
 
-void Gameboard::Drawable::SetMarginHeight(const int marginHeight)
+void Drawable::SetMarginHeight(const int marginHeight)
 {
     m_margin.y = marginHeight;
 }
 
-void Gameboard::Drawable::SetPositionOnScreen(const int x, const int y)
+void Drawable::SetPositionOnScreen(const int x, const int y)
 {
     m_positionOnScreen = { x, y };
 }
 
-IntVector2 Gameboard::Drawable::GetPositionOnScreen() const
+IntVector2 Drawable::GetPositionOnScreen() const
 {
     return m_positionOnScreen;
 }
 
-void Gameboard::Drawable::SetGridCoords(const IntVector2 coords)
+void Drawable::SetGridCoords(const IntVector2 coords)
 {
     m_coords = coords;
 }
 
-IntVector2 Gameboard::Drawable::GetGridCoords() const
+IntVector2 Drawable::GetGridCoords() const
 {
     return m_coords;
 }
 
-Gameboard::DrawableTexture::DrawableTexture(const char* textureFilePath, const IntVector2 pixalDimensions, const IntVector2 margin)
+DrawableTexture::DrawableTexture(const char* textureFilePath, const IntVector2 pixalDimensions, const IntVector2 margin)
     : Drawable(pixalDimensions, margin), m_renderedTexture(LoadTexture(textureFilePath))
 {
 }
 
-Texture2D Gameboard::DrawableTexture::GetTexture() const
+Texture2D DrawableTexture::GetTexture() const
 {
     return m_renderedTexture;
 }
 
-void Gameboard::DrawableTexture::SetTexture(const char* textureFilePath)
+void DrawableTexture::SetTexture(const char* textureFilePath)
 {
     if (!FileExists(textureFilePath)) throw std::invalid_argument("File does not exist.");
 
     m_renderedTexture = LoadTexture(textureFilePath);
 }
 
-void Gameboard::DrawableTexture::Render() const
+void DrawableTexture::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
     float scaleY = GetHeight() / m_renderedTexture.height;
@@ -98,54 +99,54 @@ void Gameboard::DrawableTexture::Render() const
     DrawTextureEx(m_renderedTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
 }
 
-Gameboard::Text::Text(std::string text, int fontSize, Color colour)
+Text::Text(std::string text, int fontSize, Color colour)
     : Drawable(IntVector2{ MeasureText(text.c_str(), fontSize), 10 }, IntVector2{ 0,0 }),
     m_text(text), m_fontSize(fontSize), m_colour(colour)
 {
 }
 
-std::string Gameboard::Text::GetText() const
+std::string Text::GetText() const
 {
     return m_text;
 }
 
-void Gameboard::Text::SetText(const std::string text)
+void Text::SetText(const std::string text)
 {
     m_text = text;
 }
 
-int Gameboard::Text::GetFontSize() const
+int Text::GetFontSize() const
 {
     return m_fontSize;
 }
 
-void Gameboard::Text::SetFontSize(const int fontSize)
+void Text::SetFontSize(const int fontSize)
 {
     m_fontSize = fontSize;
 }
 
-int Gameboard::Text::GetWidth() const
+int Text::GetWidth() const
 {
     return MeasureTextEx(m_font, m_text.c_str(), m_fontSize, 0).x;
 }
 
-int Gameboard::Text::GetHeight() const
+int Text::GetHeight() const
 {
     return MeasureTextEx(m_font, m_text.c_str(), m_fontSize, 0).y;
 }
 
-Gameboard::AnchorPoints Gameboard::Text::GetAnchorPoint() const
+AnchorPoints Text::GetAnchorPoint() const
 {
     return m_anchorPoint;
 }
 
-void Gameboard::Text::SetAnchorPoint(const AnchorPoints anchorpoint)
+void Text::SetAnchorPoint(const AnchorPoints anchorpoint)
 {
     m_anchorPoint = anchorpoint;
     SetPositionOnScreen(m_positionOnScreen.x, m_positionOnScreen.y);
 }
 
-void Gameboard::Text::SetPositionOnScreen(int x, int y)
+void Text::SetPositionOnScreen(int x, int y)
 {
     const int height = GetHeight();
     const int width = GetWidth();
@@ -199,17 +200,17 @@ void Gameboard::Text::SetPositionOnScreen(int x, int y)
     m_positionOnScreen = { x,y };
 }
 
-Color Gameboard::Text::GetColour() const
+Color Text::GetColour() const
 {
     return m_colour;
 }
 
-void Gameboard::Text::SetColour(const Color colour)
+void Text::SetColour(const Color colour)
 {
     m_colour = colour;
 }
 
-void Gameboard::Text::Render() const
+void Text::Render() const
 {
     DrawText(m_text.c_str(), m_positionOnScreen.x, m_positionOnScreen.y, m_fontSize, m_colour);
 }

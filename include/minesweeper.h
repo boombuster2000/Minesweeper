@@ -90,7 +90,7 @@ namespace Minesweeper
         void HandleLeftClick(Tile& tile);
 
     public:
-        MinesweeperGrid(const IntVector2 dimensions, const Minesweeper::Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position);
+        MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position);
 
         void ProcessMouseInput() override;
 
