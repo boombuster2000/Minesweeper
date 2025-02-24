@@ -119,8 +119,8 @@ void MinesweeperGrid::PlaceBombsOnBoard()
 {
     while (m_bombCoordinates.size() < m_numberOfBombs) {
         m_bombCoordinates.insert({
-            GetRandomValue(0, m_grid[0].size() - 1),
-            GetRandomValue(0, m_grid.size() - 1)
+            GetRandomValue(0, (int)m_grid[0].size() - 1),
+            GetRandomValue(0, (int)m_grid.size() - 1)
             });
     }
 
