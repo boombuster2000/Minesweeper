@@ -1,8 +1,4 @@
 #include "raylib.h"
-#include <vector>
-#include <random>
-#include <set>
-#include <string>
 #include "minesweeper.h"
 
 
