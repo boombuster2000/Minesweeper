@@ -91,8 +91,8 @@ void DrawableTexture::SetTexture(const char* textureFilePath)
 void DrawableTexture::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
-    float scaleY = GetHeight() / m_renderedTexture.height;
-    float scaleX = GetWidth() / m_renderedTexture.width;
+    float scaleY = (float)GetHeight() / (float)m_renderedTexture.height;
+    float scaleX = (float)GetWidth() / (float)m_renderedTexture.width;
 
     float scale = std::min(scaleX, scaleY);
 
@@ -127,12 +127,12 @@ void Text::SetFontSize(const int fontSize)
 
 int Text::GetWidth() const
 {
-    return MeasureTextEx(m_font, m_text.c_str(), m_fontSize, 0).x;
+    return (int)MeasureTextEx(m_font, m_text.c_str(), (float)m_fontSize, 0).x;
 }
 
 int Text::GetHeight() const
 {
-    return MeasureTextEx(m_font, m_text.c_str(), m_fontSize, 0).y;
+    return (int)MeasureTextEx(m_font, m_text.c_str(), (float)m_fontSize, 0).y;
 }
 
 AnchorPoints Text::GetAnchorPoint() const
