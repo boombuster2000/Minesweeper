@@ -151,7 +151,7 @@ namespace Gameboard
                 throw std::runtime_error("Empty grid");
             }
 
-            IntVector2 dimensions;
+            IntVector2 dimensions = {};
             T_Entity square = m_grid[0][0];
 
             dimensions.x = m_grid[0].size() * square.GetWidth() + (m_grid[0].size() - 1) * square.GetMarginWidth();
