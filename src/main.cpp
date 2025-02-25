@@ -13,7 +13,6 @@ int main()
 	flagsLeft.SetPositionOnScreen(GetScreenWidth() - 170, 80);
 
 	Gameboard::Text winText("You found all the bombs!", 50, BLUE);
-	winText.SetAnchorPoint(Gameboard::AnchorPoints::MIDDLE);
 	winText.SetPositionOnScreen(10, 10);
 
 	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE);
@@ -52,7 +51,7 @@ int main()
 			flagsLeft.Render();
 
 
-			if (!game.IsBombTriggered())
+			if (!game.IsBombTriggered() && game.GetNumberOfBombsLeft() != 0)
 			{
 				game.ProcessMouseInput();
 			}
