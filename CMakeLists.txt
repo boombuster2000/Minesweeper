@@ -1,6 +1,4 @@
-﻿# CMakeList.txt : CMake project for Minesweeper, include source and define
-# project specific logic here.
-#
+﻿# CMake project for Minesweeper
 cmake_minimum_required (VERSION 3.8)
 
 # Enable Hot Reload for MSVC compilers if supported.
@@ -23,15 +21,20 @@ FetchContent_Declare(
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(raylib)
 
+# Add include directories
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
-# Add source to this project's executable.
-add_executable (Minesweeper "Minesweeper.cpp")
+# Add source files from /src
+file(GLOB SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+
+# Add source to this project's executable
+add_executable(Minesweeper ${SOURCES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Minesweeper PROPERTY CXX_STANDARD 20)
 endif()
 
-#file(COPY "${CMAKE_SOURCE_DIR}/resources" DESTINATION "${CMAKE_BINARY_DIR}")
+# Copy resources after build
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_SOURCE_DIR}/resources"
