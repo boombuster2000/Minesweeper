@@ -45,7 +45,7 @@ namespace Gameboard
         void LoadTextures();
         void UnloadTextures();
 
-        std::shared_ptr<Texture2D> GetTexture(std::string textureID);
+        std::shared_ptr<Texture2D> GetTexture(const std::string textureID) const;
         
     };
 

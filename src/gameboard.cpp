@@ -29,7 +29,7 @@ void TexturesHandler::UnloadTextures()
     }
 }
 
-std::shared_ptr<Texture2D> TexturesHandler::GetTexture(std::string textureID)
+std::shared_ptr<Texture2D> TexturesHandler::GetTexture(const std::string textureID) const
 {
     return std::make_shared<Texture2D>(m_textures.at(textureID));
 }
