@@ -1,8 +1,31 @@
 #include "minesweeper.h"
 using namespace Minesweeper;
 
+const std::string Minesweeper::texturesBaseFilePath = "./resources/textures/";
+
+const std::map<std::string, std::string> Minesweeper::textureFilePaths =
+{
+    {"bomb", texturesBaseFilePath + "bomb.png"},
+    {"covered-tile", texturesBaseFilePath + "covered-tile.png"},
+    {"empty-tile", texturesBaseFilePath + "empty-tile.png"},
+    {"flag", texturesBaseFilePath + "flag.png"},
+    {"incorect", texturesBaseFilePath + "incorrect.png"},
+    {"one", texturesBaseFilePath + "one.png"},
+    {"two", texturesBaseFilePath + "two.png"},
+    {"three", texturesBaseFilePath + "three.png"},
+    {"four", texturesBaseFilePath + "four.png"},
+    {"five", texturesBaseFilePath + "five.png"},
+    {"six", texturesBaseFilePath + "six.png"},
+    {"seven", texturesBaseFilePath + "seven.png"},
+    {"eight", texturesBaseFilePath + "eight.png"},
+
+};
+
+Gameboard::TexturesHandler Minesweeper::texturesHandler (textureFilePaths);
+
+
 Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
-    : DrawableTexture("./resources/textures/covered-tile.png", dimensions, margin)
+    : DrawableTexture(texturesHandler.GetTexture("covered-tile"), dimensions, margin)
 {
 }
 
@@ -18,45 +41,54 @@ void Tile::SetContentOption(ContentOption contentOption)
     switch (m_entityOption)
     {
     case ContentOption::BOMB:
-        m_contentTextureFilePath = contentTexturesFilePaths.bomb;
+        SetContentTexture(texturesHandler.GetTexture("bomb"));
         break;
+
     case ContentOption::ONE:
-        m_contentTextureFilePath = contentTexturesFilePaths.one;
+        SetContentTexture(texturesHandler.GetTexture("one"));
         break;
+
     case ContentOption::TWO:
-        m_contentTextureFilePath = contentTexturesFilePaths.two;
+        SetContentTexture(texturesHandler.GetTexture("two"));
         break;
+
     case ContentOption::THREE:
-        m_contentTextureFilePath = contentTexturesFilePaths.three;
+        SetContentTexture(texturesHandler.GetTexture("three"));
         break;
+
     case ContentOption::FOUR:
-        m_contentTextureFilePath = contentTexturesFilePaths.four;
+        SetContentTexture(texturesHandler.GetTexture("four"));
         break;
+
     case ContentOption::FIVE:
-        m_contentTextureFilePath = contentTexturesFilePaths.five;
+        SetContentTexture(texturesHandler.GetTexture("five"));
         break;
+
     case ContentOption::SIX:
-        m_contentTextureFilePath = contentTexturesFilePaths.six;
+        SetContentTexture(texturesHandler.GetTexture("six"));
         break;
+
     case ContentOption::SEVEN:
-        m_contentTextureFilePath = contentTexturesFilePaths.seven;
+        SetContentTexture(texturesHandler.GetTexture("seven"));
         break;
+
     case ContentOption::EIGHT:
-        m_contentTextureFilePath = contentTexturesFilePaths.eight;
+        SetContentTexture(texturesHandler.GetTexture("eight"));
         break;
+
     default:
         break;
     }
 }
 
-const char* Tile::GetContentTextureFilePath() const
+std::shared_ptr<Texture2D> Tile::GetContentTexture() const
 {
-    return m_contentTextureFilePath;
+    return m_contentTexture;
 }
 
-void Tile::SetContentTextureFilePath(const char* textureFilePath)
+void Tile::SetContentTexture(std::shared_ptr<Texture2D> texture)
 {
-    m_contentTextureFilePath = textureFilePath;
+    m_contentTexture = texture;
 }
 
 bool Tile::IsTileCovered() const
@@ -82,13 +114,13 @@ void Tile::ToggleFlag()
 void Tile::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
-    float scale = (float)GetHeight() / GetTexture().height;
+    float scale = (float)GetHeight() / GetTexture()->height;
 
-    DrawTextureEx(GetTexture(), { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
+    DrawTextureEx(*GetTexture(), { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
 
     if (IsTileFlagged() && IsTileCovered())
     {
-        DrawTextureEx(m_flagTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
+        DrawTextureEx(*m_flagTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
     }
 }
 
@@ -126,7 +158,7 @@ void MinesweeperGrid::PlaceBombsOnBoard()
 
     for (const auto& [x, y] : m_bombCoordinates) {
         m_grid[y][x].SetContentOption(Tile::ContentOption::BOMB);
-        m_grid[y][x].SetContentTextureFilePath("./resources/textures/bomb.png");
+        m_grid[y][x].SetContentTexture(texturesHandler.GetTexture("bomb"));
     }
 
     // Simplified number assignment
@@ -153,7 +185,7 @@ void MinesweeperGrid::ClearEmptyNeighbours(const Tile& homeTile)
         IntVector2 coords = neighbour.GetGridCoords();
         Tile& tile = m_grid[coords.y][coords.x];
 
-        tile.SetTexture(neighbour.GetContentTextureFilePath());
+        tile.SetTexture(neighbour.GetContentTexture());
         tile.ToggleCovered();
 
         clearedNeighbours.push_back(neighbour);
@@ -198,7 +230,7 @@ void MinesweeperGrid::HandleLeftClick(Tile& tile)
     if (!tile.IsTileCovered() || tile.IsTileFlagged()) return;
 
     tile.ToggleCovered();
-    tile.SetTexture(tile.GetContentTextureFilePath());
+    tile.SetTexture(tile.GetContentTexture());
 
     switch (tile.GetContentOption()) {
     case Tile::ContentOption::EMPTY:
@@ -217,6 +249,7 @@ void MinesweeperGrid::ProcessMouseInput()
     if (!(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))) return;
 
     Vector2 mousePosition = GetMousePosition();
+    bool isClickedTileFound = false;
 
     for (auto& row : m_grid)
     {
@@ -227,8 +260,11 @@ void MinesweeperGrid::ProcessMouseInput()
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) HandleLeftClick(tile);
             else if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) HandleRightClick(tile);
 
+            isClickedTileFound = true;
             break;
         }
+
+        if (isClickedTileFound) break;
     }
 }
 
@@ -252,7 +288,7 @@ void MinesweeperGrid::DisplayBombs()
     for (const auto& [x, y] : m_bombCoordinates) {
         if (m_grid[y][x].IsTileFlagged() && m_grid[y][x].GetContentOption() == Tile::ContentOption::BOMB) continue;
         if (!m_grid[y][x].IsTileCovered()) continue;
-        m_grid[y][x].SetTexture(m_grid[y][x].GetContentTextureFilePath());
+        m_grid[y][x].SetTexture(m_grid[y][x].GetContentTexture());
         m_grid[y][x].ToggleCovered();
     }
 
@@ -266,7 +302,7 @@ void MinesweeperGrid::DisplayBombs()
             if (!tile.IsTileFlagged()) continue;
             if (tile.GetContentOption() == Tile::ContentOption::BOMB) continue;
 
-            m_grid[y][x].SetTexture("./resources/textures/incorrect.png");
+            m_grid[y][x].SetTexture(texturesHandler.GetTexture("incorrect"));
             m_grid[y][x].ToggleFlag();
         }
     }

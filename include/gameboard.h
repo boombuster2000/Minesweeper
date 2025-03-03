@@ -4,6 +4,8 @@
 #include <random>
 #include <type_traits>
 #include <string>
+#include <map>
+#include <memory>
 
 struct IntVector2
 {
@@ -28,6 +30,22 @@ namespace Gameboard
         BOTTOM_LEFT,
         BOTTOM_MIDDLE,
         BOTTOM_RIGHT,
+    };
+
+    class TexturesHandler
+    {
+    private:
+        std::map<std::string, Texture2D> m_textures;
+        std::map<std::string, std::string> m_textureFilePaths;
+
+    public:
+        TexturesHandler(const std::map<std::string, std::string>& textureFilePaths);
+
+        // Must be done after initialising window with raylib
+        void LoadTextures();
+
+        std::shared_ptr<Texture2D> GetTexture(std::string textureID);
+        
     };
 
     class Drawable
@@ -65,13 +83,13 @@ namespace Gameboard
     class DrawableTexture : public Drawable
     {
     private:
-        Texture2D m_renderedTexture;
+        std::shared_ptr<Texture2D> m_renderedTexture;
 
     public:
-        DrawableTexture(const char* textureFilePath, const IntVector2 pixalDimensions, const IntVector2 margin);
+        DrawableTexture(std::shared_ptr<Texture2D> texture, const IntVector2 pixalDimensions, const IntVector2 margin);
 
-        Texture2D GetTexture() const;
-        void SetTexture(const char* textureFilePath);
+        std::shared_ptr<Texture2D> GetTexture() const;
+        void SetTexture(std::shared_ptr<Texture2D> texture);
 
         void Render() const override;
     };

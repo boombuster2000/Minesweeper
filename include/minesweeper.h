@@ -6,9 +6,17 @@
 #include <random>
 #include <set>
 #include <string>
+#include <map>
+#include <memory>
 
 namespace Minesweeper
 {
+
+    extern const std::string texturesBaseFilePath;
+    extern const std::map<std::string, std::string> textureFilePaths;
+    extern Gameboard::TexturesHandler texturesHandler;
+
+
     class Tile : public Gameboard::DrawableTexture
     {
     public:
@@ -26,27 +34,10 @@ namespace Minesweeper
             EIGHT = 8
         };
 
-        struct
-        {
-            const char* bomb = "./resources/textures/bomb.png";
-            const char* coveredTile = "./resources/textures/covered-tile.png";
-            const char* emptyTile = "./resources/textures/empty-tile.png";
-            const char* flag = "./resources/textures/flag.png";
-            const char* incorrect = "./resources/textures/incorrect.png";
-            const char* one = "./resources/textures/one.png";
-            const char* two = "./resources/textures/two.png";
-            const char* three = "./resources/textures/three.png";
-            const char* four = "./resources/textures/four.png";
-            const char* five = "./resources/textures/five.png";
-            const char* six = "./resources/textures/six.png";
-            const char* seven = "./resources/textures/seven.png";
-            const char* eight = "./resources/textures/eight.png";
-        } contentTexturesFilePaths;
-
     private:
         ContentOption m_entityOption = ContentOption::EMPTY;
-        const char* m_contentTextureFilePath = contentTexturesFilePaths.emptyTile;
-        const Texture2D m_flagTexture = LoadTexture(contentTexturesFilePaths.flag);
+        std::shared_ptr<Texture2D> m_contentTexture = texturesHandler.GetTexture("empty-tile");
+        const std::shared_ptr<Texture2D> m_flagTexture = texturesHandler.GetTexture("flag");
         bool m_isCovered = true;
         bool m_isFlagged = false;
 
@@ -56,8 +47,8 @@ namespace Minesweeper
         ContentOption GetContentOption() const;
         void SetContentOption(ContentOption contentOption);
 
-        const char* GetContentTextureFilePath() const;
-        void SetContentTextureFilePath(const char* textureFilePath);
+        std::shared_ptr<Texture2D> GetContentTexture() const;
+        void SetContentTexture(std::shared_ptr<Texture2D> textureFilePath);
 
         bool IsTileCovered() const;
         void ToggleCovered();

@@ -7,6 +7,8 @@ int main()
 	InitWindow(800, 600, "Minesweeper");
 	SetTargetFPS(60);
 
+	Minesweeper::texturesHandler.LoadTextures();
+
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
 	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED);

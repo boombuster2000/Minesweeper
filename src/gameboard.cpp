@@ -6,6 +6,27 @@ bool IntVector2::operator==(const IntVector2& other) const
     return x == other.x && y == other.y;
 }
 
+
+TexturesHandler::TexturesHandler(const std::map<std::string, std::string>& textureFilePaths)
+{
+    m_textureFilePaths = textureFilePaths;
+}
+
+void TexturesHandler::LoadTextures()
+{
+    for (auto& textureFilePath : m_textureFilePaths)
+    {
+        if (!FileExists(textureFilePath.second.c_str()))  throw std::runtime_error("Error: Texture file does not exist - " + textureFilePath.second);
+        m_textures.insert({ textureFilePath.first, LoadTexture(textureFilePath.second.c_str()) });
+    }
+}
+
+std::shared_ptr<Texture2D> TexturesHandler::GetTexture(std::string textureID)
+{
+    return std::make_shared<Texture2D>(m_textures.at(textureID));
+}
+
+
 Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
     : m_dimensions(dimensions), m_margin(margin)
 {
@@ -71,33 +92,34 @@ IntVector2 Drawable::GetGridCoords() const
     return m_coords;
 }
 
-DrawableTexture::DrawableTexture(const char* textureFilePath, const IntVector2 pixalDimensions, const IntVector2 margin)
-    : Drawable(pixalDimensions, margin), m_renderedTexture(LoadTexture(textureFilePath))
+
+DrawableTexture::DrawableTexture(std::shared_ptr<Texture2D> texture, const IntVector2 pixalDimensions, const IntVector2 margin)
+    : Drawable(pixalDimensions, margin), m_renderedTexture(texture)
 {
 }
 
-Texture2D DrawableTexture::GetTexture() const
+std::shared_ptr<Texture2D> DrawableTexture::GetTexture() const
 {
     return m_renderedTexture;
 }
 
-void DrawableTexture::SetTexture(const char* textureFilePath)
+void DrawableTexture::SetTexture(std::shared_ptr<Texture2D> texture)
 {
-    if (!FileExists(textureFilePath)) throw std::invalid_argument("File does not exist.");
 
-    m_renderedTexture = LoadTexture(textureFilePath);
+    m_renderedTexture = texture;
 }
 
 void DrawableTexture::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
-    float scaleY = (float)GetHeight() / (float)m_renderedTexture.height;
-    float scaleX = (float)GetWidth() / (float)m_renderedTexture.width;
+    float scaleY = (float)GetHeight() / (float)m_renderedTexture->height;
+    float scaleX = (float)GetWidth() / (float)m_renderedTexture->width;
 
     float scale = std::min(scaleX, scaleY);
 
-    DrawTextureEx(m_renderedTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
+    DrawTextureEx(*m_renderedTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
 }
+
 
 Text::Text(std::string text, int fontSize, Color colour)
     : Drawable(IntVector2{ MeasureText(text.c_str(), fontSize), 10 }, IntVector2{ 0,0 }),
