@@ -43,6 +43,7 @@ namespace Gameboard
 
         // Must be done after initialising window with raylib
         void LoadTextures();
+        void UnloadTextures();
 
         std::shared_ptr<Texture2D> GetTexture(std::string textureID);
         

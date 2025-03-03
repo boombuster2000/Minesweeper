@@ -21,6 +21,14 @@ void TexturesHandler::LoadTextures()
     }
 }
 
+void TexturesHandler::UnloadTextures()
+{
+    for (auto& texture : m_textures)
+    {
+        UnloadTexture(texture.second);
+    }
+}
+
 std::shared_ptr<Texture2D> TexturesHandler::GetTexture(std::string textureID)
 {
     return std::make_shared<Texture2D>(m_textures.at(textureID));

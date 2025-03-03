@@ -82,6 +82,7 @@ int main()
 		}
 	}
 
+	Minesweeper::texturesHandler.UnloadTextures();
 	CloseWindow();
 	return 0;
 }
