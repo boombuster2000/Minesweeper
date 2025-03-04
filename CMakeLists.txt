@@ -1,5 +1,4 @@
-﻿# CMake project for Minesweeper
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -15,23 +14,34 @@ set(RAYLIB_VERSION 5.0)
 FetchContent_Declare(
     raylib
     URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.zip
-    FIND_PACKAGE_ARGS ${RAYLIB_VERSION} EXACT
 )
 
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(raylib)
 
-# Add include directories
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
 # Add source files from /src
-file(GLOB SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 # Add source to this project's executable
 add_executable(Minesweeper ${SOURCES})
 
+# Set C++ standard
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Minesweeper PROPERTY CXX_STANDARD 20)
+endif()
+
+# Include directories
+target_include_directories(Minesweeper PUBLIC 
+    ${CMAKE_SOURCE_DIR}/include
+    ${raylib_SOURCE_DIR}/src
+)
+
+# Link raylib
+target_link_libraries(Minesweeper raylib)
+
+# Windows-specific linking
+if (WIN32)
+    target_link_libraries(Minesweeper winmm)
 endif()
 
 # Copy resources after build
@@ -40,7 +50,5 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     "${CMAKE_SOURCE_DIR}/resources"
     "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"
 )
-
-target_link_libraries(${PROJECT_NAME} raylib)
 
 # TODO: Add tests and install targets if needed.
