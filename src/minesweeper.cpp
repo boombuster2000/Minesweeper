@@ -9,7 +9,7 @@ const std::map<std::string, std::string> Minesweeper::textureFilePaths =
     {"covered-tile", texturesBaseFilePath + "covered-tile.png"},
     {"empty-tile", texturesBaseFilePath + "empty-tile.png"},
     {"flag", texturesBaseFilePath + "flag.png"},
-    {"incorect", texturesBaseFilePath + "incorrect.png"},
+    {"incorrect", texturesBaseFilePath + "incorrect.png"},
     {"one", texturesBaseFilePath + "one.png"},
     {"two", texturesBaseFilePath + "two.png"},
     {"three", texturesBaseFilePath + "three.png"},
