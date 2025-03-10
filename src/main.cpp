@@ -7,20 +7,21 @@ int main()
 	InitWindow(800, 600, "Minesweeper");
 	SetTargetFPS(60);
 
-	Minesweeper::texturesHandler.LoadTextures();
+	Minesweeper::assetsHandler.LoadTextures(LoadDirectoryFiles("./assets/textures"));
+	Minesweeper::assetsHandler.LoadFonts(LoadDirectoryFiles("./assets/fonts"));
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
-	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED);
+	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
 	flagsLeft.SetPositionOnScreen(GetScreenWidth() - 170, 80);
 
-	Gameboard::Text winText("You found all the bombs!", 50, BLUE);
+	Gameboard::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
 	winText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE);
+	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
 	loseText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE);
+	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
 	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
 
 	bool shouldPlayAgain = true;
@@ -82,7 +83,7 @@ int main()
 		}
 	}
 
-	Minesweeper::texturesHandler.UnloadTextures();
+	//Minesweeper::assetsHandler.UnloadTe();
 	CloseWindow();
 	return 0;
 }

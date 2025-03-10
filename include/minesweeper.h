@@ -14,7 +14,7 @@ namespace Minesweeper
 
     extern const std::string texturesBaseFilePath;
     extern const std::map<std::string, std::string> textureFilePaths;
-    extern Gameboard::TexturesHandler texturesHandler;
+    extern Gameboard::AssetsHandler assetsHandler;
 
 
     class Tile : public Gameboard::DrawableTexture
@@ -36,8 +36,8 @@ namespace Minesweeper
 
     private:
         ContentOption m_entityOption = ContentOption::EMPTY;
-        std::shared_ptr<Texture2D> m_contentTexture = texturesHandler.GetTexture("empty-tile");
-        const std::shared_ptr<Texture2D> m_flagTexture = texturesHandler.GetTexture("flag");
+        std::shared_ptr<Texture2D> m_contentTexture = assetsHandler.GetTexture("empty-tile");
+        const std::shared_ptr<Texture2D> m_flagTexture = assetsHandler.GetTexture("flag");
         bool m_isCovered = true;
         bool m_isFlagged = false;
 

@@ -1,39 +1,52 @@
 #include "gameboard.h"
 using namespace Gameboard;
 
+
 bool IntVector2::operator==(const IntVector2& other) const
 {
     return x == other.x && y == other.y;
 }
 
+Font Gameboard::defaultFont = GetFontDefault();
+std::shared_ptr<Font> Gameboard::defaultFont_ptr = std::make_shared<Font>(Gameboard::defaultFont);
 
-TexturesHandler::TexturesHandler(const std::map<std::string, std::string>& textureFilePaths)
-{
-    m_textureFilePaths = textureFilePaths;
-}
+AssetsHandler::AssetsHandler() = default;
 
-void TexturesHandler::LoadTextures()
+void AssetsHandler::LoadTextures(FilePathList textureFilePaths)
 {
-    for (auto& textureFilePath : m_textureFilePaths)
+    for (int i = 0; i < textureFilePaths.count; i++)
     {
-        if (!FileExists(textureFilePath.second.c_str()))  throw std::runtime_error("Error: Texture file does not exist - " + textureFilePath.second);
-        m_textures.insert({ textureFilePath.first, LoadTexture(textureFilePath.second.c_str()) });
+        std::string currentFilePath = textureFilePaths.paths[i];
+
+        if (IsPathFile(currentFilePath.c_str()))
+        {
+            m_textures.insert({ GetFileNameWithoutExt(currentFilePath.c_str()),LoadTexture(currentFilePath.c_str()) });
+        }
     }
 }
 
-void TexturesHandler::UnloadTextures()
+void AssetsHandler::LoadFonts(FilePathList fontFilePaths)
 {
-    for (auto& texture : m_textures)
+    for (int i = 0; i < fontFilePaths.count; i++)
     {
-        UnloadTexture(texture.second);
+        std::string currentFilePath = fontFilePaths.paths[i];
+
+        if (IsPathFile(currentFilePath.c_str()))
+        {
+            m_fonts.insert({ GetFileNameWithoutExt(currentFilePath.c_str()),LoadFont(currentFilePath.c_str()) });
+        }
     }
 }
 
-std::shared_ptr<Texture2D> TexturesHandler::GetTexture(const std::string textureID) const
+std::shared_ptr<Texture2D> AssetsHandler::GetTexture(std::string id)
 {
-    return std::make_shared<Texture2D>(m_textures.at(textureID));
+    return std::make_shared<Texture2D>(m_textures.at(id));
 }
 
+std::shared_ptr<Font> AssetsHandler::GetFont(std::string id)
+{
+    return std::make_shared<Font>(m_fonts.at(id));
+}
 
 Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
     : m_dimensions(dimensions), m_margin(margin)
@@ -128,10 +141,9 @@ void DrawableTexture::Render() const
     DrawTextureEx(*m_renderedTexture, { (float)positionOnScreen.x, (float)positionOnScreen.y }, 0, scale, WHITE);
 }
 
-
-Text::Text(std::string text, int fontSize, Color colour)
+Text::Text(std::string text, int fontSize, Color colour, std::shared_ptr<Font> font) 
     : Drawable(IntVector2{ MeasureText(text.c_str(), fontSize), 10 }, IntVector2{ 0,0 }),
-    m_text(text), m_fontSize(fontSize), m_colour(colour)
+    m_text(text), m_fontSize(fontSize), m_colour(colour), m_font(font)
 {
 }
 
@@ -157,12 +169,12 @@ void Text::SetFontSize(const int fontSize)
 
 int Text::GetWidth() const
 {
-    return (int)MeasureTextEx(m_font, m_text.c_str(), (float)m_fontSize, 0).x;
+    return (int)MeasureTextEx(*m_font, m_text.c_str(), (float)m_fontSize, 0).x;
 }
 
 int Text::GetHeight() const
 {
-    return (int)MeasureTextEx(m_font, m_text.c_str(), (float)m_fontSize, 0).y;
+    return (int)MeasureTextEx(*m_font, m_text.c_str(), (float)m_fontSize, 0).y;
 }
 
 AnchorPoints Text::GetAnchorPoint() const
@@ -244,5 +256,5 @@ void Text::SetColour(const Color colour)
 void Text::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
-    DrawText(m_text.c_str(), positionOnScreen.x, positionOnScreen.y, m_fontSize, m_colour);
+    DrawTextEx(*m_font, m_text.c_str(), { (float)positionOnScreen.x, (float)positionOnScreen.y }, m_fontSize, 0, m_colour);
 }

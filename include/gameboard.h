@@ -17,6 +17,9 @@ struct IntVector2
 namespace Gameboard
 {
 
+    extern Font defaultFont;
+    extern std::shared_ptr<Font> defaultFont_ptr;
+
     enum AnchorPoints
     {
         TOP_LEFT,
@@ -32,20 +35,21 @@ namespace Gameboard
         BOTTOM_RIGHT,
     };
 
-    class TexturesHandler
+    
+    class AssetsHandler
     {
     private:
         std::map<std::string, Texture2D> m_textures;
-        std::map<std::string, std::string> m_textureFilePaths;
+        std::map<std::string, Font> m_fonts;
 
     public:
-        TexturesHandler(const std::map<std::string, std::string>& textureFilePaths);
+        AssetsHandler();
 
-        // Must be done after initialising window with raylib
-        void LoadTextures();
-        void UnloadTextures();
+        void LoadTextures(FilePathList textureFilePaths);
+        void LoadFonts(FilePathList fontFilePaths);
 
-        std::shared_ptr<Texture2D> GetTexture(const std::string textureID) const;
+        std::shared_ptr<Texture2D> GetTexture(std::string id);
+        std::shared_ptr<Font> GetFont(std::string id);
         
     };
 
@@ -100,12 +104,12 @@ namespace Gameboard
     private:
         std::string m_text;
         int m_fontSize;
-        Font m_font = GetFontDefault();
+        std::shared_ptr<Font> m_font;
         Color m_colour;
         AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
     public:
-        Text(std::string text, int fontSize, Color colour);
+        Text(std::string text, int fontSize, Color colour, std::shared_ptr<Font> font = defaultFont_ptr);
 
         std::string GetText() const;
         void SetText(const std::string text);
