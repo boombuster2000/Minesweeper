@@ -83,7 +83,8 @@ int main()
 		}
 	}
 
-	//Minesweeper::assetsHandler.UnloadTe();
+	Minesweeper::assetsHandler.UnloadTextures();
+	Minesweeper::assetsHandler.UnloadFonts();
 	CloseWindow();
 	return 0;
 }

@@ -50,7 +50,9 @@ namespace Gameboard
 
         std::shared_ptr<Texture2D> GetTexture(std::string id);
         std::shared_ptr<Font> GetFont(std::string id);
-        
+
+        void UnloadTextures();
+        void UnloadFonts();
     };
 
     class Drawable

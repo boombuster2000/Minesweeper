@@ -49,6 +49,25 @@ std::shared_ptr<Font> AssetsHandler::GetFont(std::string id)
     return std::make_shared<Font>(m_fonts.at(id));
 }
 
+void AssetsHandler::UnloadTextures()
+{
+    for (auto texture : m_textures)
+    {
+        UnloadTexture(texture.second);
+    }
+
+    m_textures.clear();
+}
+
+void AssetsHandler::UnloadFonts()
+{
+    for (auto font : m_fonts)
+    {
+        UnloadFont(font.second);
+    }
+
+    m_fonts.clear();
+}
 
 Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
     : m_dimensions(dimensions), m_margin(margin)
