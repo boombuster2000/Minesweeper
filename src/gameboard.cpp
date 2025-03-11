@@ -33,7 +33,7 @@ void AssetsHandler::LoadFonts(FilePathList fontFilePaths)
 
         if (IsPathFile(currentFilePath.c_str()))
         {
-            m_fonts.insert({ GetFileNameWithoutExt(currentFilePath.c_str()),LoadFont(currentFilePath.c_str()) });
+            m_fonts.insert({ GetFileNameWithoutExt(currentFilePath.c_str()),LoadFontEx(currentFilePath.c_str(), 500, NULL, 0) });
         }
     }
 }
