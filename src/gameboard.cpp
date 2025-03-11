@@ -10,6 +10,7 @@ bool IntVector2::operator==(const IntVector2& other) const
 Font Gameboard::defaultFont = GetFontDefault();
 std::shared_ptr<Font> Gameboard::defaultFont_ptr = std::make_shared<Font>(Gameboard::defaultFont);
 
+
 AssetsHandler::AssetsHandler() = default;
 
 void AssetsHandler::LoadTextures(FilePathList textureFilePaths)
@@ -47,6 +48,7 @@ std::shared_ptr<Font> AssetsHandler::GetFont(std::string id)
 {
     return std::make_shared<Font>(m_fonts.at(id));
 }
+
 
 Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
     : m_dimensions(dimensions), m_margin(margin)
