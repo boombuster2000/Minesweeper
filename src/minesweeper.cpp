@@ -1,28 +1,7 @@
 #include "minesweeper.h"
 using namespace Minesweeper;
 
-const std::string Minesweeper::texturesBaseFilePath = "./resources/textures/";
-
-const std::map<std::string, std::string> Minesweeper::textureFilePaths =
-{
-    {"bomb", texturesBaseFilePath + "bomb.png"},
-    {"covered-tile", texturesBaseFilePath + "covered-tile.png"},
-    {"empty-tile", texturesBaseFilePath + "empty-tile.png"},
-    {"flag", texturesBaseFilePath + "flag.png"},
-    {"incorrect", texturesBaseFilePath + "incorrect.png"},
-    {"one", texturesBaseFilePath + "one.png"},
-    {"two", texturesBaseFilePath + "two.png"},
-    {"three", texturesBaseFilePath + "three.png"},
-    {"four", texturesBaseFilePath + "four.png"},
-    {"five", texturesBaseFilePath + "five.png"},
-    {"six", texturesBaseFilePath + "six.png"},
-    {"seven", texturesBaseFilePath + "seven.png"},
-    {"eight", texturesBaseFilePath + "eight.png"},
-
-};
-
 Gameboard::AssetsHandler Minesweeper::assetsHandler;
-
 
 Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
     : DrawableTexture(assetsHandler.GetTexture("covered-tile"), dimensions, margin)
