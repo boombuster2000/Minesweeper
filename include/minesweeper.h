@@ -36,8 +36,8 @@ namespace Minesweeper
 
     private:
         ContentOption m_entityOption = ContentOption::EMPTY;
-        std::shared_ptr<Texture2D> m_contentTexture = assetsHandler.GetTexture("empty-tile");
-        const std::shared_ptr<Texture2D> m_flagTexture = assetsHandler.GetTexture("flag");
+        std::shared_ptr<Texture2D> m_contentTexture = assetsHandler.texturesHandler.GetAsset("empty-tile");
+        const std::shared_ptr<Texture2D> m_flagTexture = assetsHandler.texturesHandler.GetAsset("flag");
         bool m_isCovered = true;
         bool m_isFlagged = false;
 

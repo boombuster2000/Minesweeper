@@ -4,7 +4,7 @@ using namespace Minesweeper;
 Gameboard::AssetsHandler Minesweeper::assetsHandler;
 
 Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
-    : DrawableTexture(assetsHandler.GetTexture("covered-tile"), dimensions, margin)
+    : DrawableTexture(assetsHandler.texturesHandler.GetAsset("covered-tile"), dimensions, margin)
 {
 }
 
@@ -20,39 +20,39 @@ void Tile::SetContentOption(ContentOption contentOption)
     switch (m_entityOption)
     {
     case ContentOption::BOMB:
-        SetContentTexture(assetsHandler.GetTexture("bomb"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("bomb"));
         break;
 
     case ContentOption::ONE:
-        SetContentTexture(assetsHandler.GetTexture("one"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("one"));
         break;
 
     case ContentOption::TWO:
-        SetContentTexture(assetsHandler.GetTexture("two"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("two"));
         break;
 
     case ContentOption::THREE:
-        SetContentTexture(assetsHandler.GetTexture("three"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("three"));
         break;
 
     case ContentOption::FOUR:
-        SetContentTexture(assetsHandler.GetTexture("four"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("four"));
         break;
 
     case ContentOption::FIVE:
-        SetContentTexture(assetsHandler.GetTexture("five"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("five"));
         break;
 
     case ContentOption::SIX:
-        SetContentTexture(assetsHandler.GetTexture("six"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("six"));
         break;
 
     case ContentOption::SEVEN:
-        SetContentTexture(assetsHandler.GetTexture("seven"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("seven"));
         break;
 
     case ContentOption::EIGHT:
-        SetContentTexture(assetsHandler.GetTexture("eight"));
+        SetContentTexture(assetsHandler.texturesHandler.GetAsset("eight"));
         break;
 
     default:
@@ -137,7 +137,7 @@ void MinesweeperGrid::PlaceBombsOnBoard()
 
     for (const auto& [x, y] : m_bombCoordinates) {
         m_grid[y][x].SetContentOption(Tile::ContentOption::BOMB);
-        m_grid[y][x].SetContentTexture(assetsHandler.GetTexture("bomb"));
+        m_grid[y][x].SetContentTexture(assetsHandler.texturesHandler.GetAsset("bomb"));
     }
 
     // Simplified number assignment
@@ -281,7 +281,7 @@ void MinesweeperGrid::DisplayBombs()
             if (!tile.IsTileFlagged()) continue;
             if (tile.GetContentOption() == Tile::ContentOption::BOMB) continue;
 
-            m_grid[y][x].SetTexture(assetsHandler.GetTexture("incorrect"));
+            m_grid[y][x].SetTexture(assetsHandler.texturesHandler.GetAsset("incorrect"));
             m_grid[y][x].ToggleFlag();
         }
     }

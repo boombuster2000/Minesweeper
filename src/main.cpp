@@ -7,21 +7,21 @@ int main()
 	InitWindow(800, 600, "Minesweeper");
 	SetTargetFPS(60);
 
-	Minesweeper::assetsHandler.LoadTextures(LoadDirectoryFiles("./assets/textures"));
-	Minesweeper::assetsHandler.LoadFonts(LoadDirectoryFiles("./assets/fonts"));
+	Minesweeper::assetsHandler.texturesHandler.LoadAssets(LoadDirectoryFiles("./assets/textures"));
+	Minesweeper::assetsHandler.fontsHandler.LoadAssets(LoadDirectoryFiles("./assets/fonts"));
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
-	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
+	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
 	flagsLeft.SetPositionOnScreen(GetScreenWidth() - 170, 80);
 
-	Gameboard::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
+	Gameboard::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
 	winText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
+	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
 	loseText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assetsHandler.GetFont("arialroundedmtbold"));
+	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
 	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
 
 	bool shouldPlayAgain = true;
@@ -83,8 +83,8 @@ int main()
 		}
 	}
 
-	Minesweeper::assetsHandler.UnloadTextures();
-	Minesweeper::assetsHandler.UnloadFonts();
+	Minesweeper::assetsHandler.texturesHandler.UnloadAssets();
+	Minesweeper::assetsHandler.fontsHandler.UnloadAssets();
 	CloseWindow();
 	return 0;
 }

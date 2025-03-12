@@ -10,64 +10,8 @@ bool IntVector2::operator==(const IntVector2& other) const
 Font Gameboard::defaultFont = GetFontDefault();
 std::shared_ptr<Font> Gameboard::defaultFont_ptr = std::make_shared<Font>(Gameboard::defaultFont);
 
-
 AssetsHandler::AssetsHandler() = default;
 
-void AssetsHandler::LoadTextures(FilePathList textureFilePaths)
-{
-    for (int i = 0; i < textureFilePaths.count; i++)
-    {
-        std::string currentFilePath = textureFilePaths.paths[i];
-
-        if (IsPathFile(currentFilePath.c_str()))
-        {
-            m_textures.insert({ GetFileNameWithoutExt(currentFilePath.c_str()),LoadTexture(currentFilePath.c_str()) });
-        }
-    }
-}
-
-void AssetsHandler::LoadFonts(FilePathList fontFilePaths)
-{
-    for (int i = 0; i < fontFilePaths.count; i++)
-    {
-        std::string currentFilePath = fontFilePaths.paths[i];
-
-        if (IsPathFile(currentFilePath.c_str()))
-        {
-            m_fonts.insert({ GetFileNameWithoutExt(currentFilePath.c_str()),LoadFontEx(currentFilePath.c_str(), 500, NULL, 0) });
-        }
-    }
-}
-
-std::shared_ptr<Texture2D> AssetsHandler::GetTexture(std::string id)
-{
-    return std::make_shared<Texture2D>(m_textures.at(id));
-}
-
-std::shared_ptr<Font> AssetsHandler::GetFont(std::string id)
-{
-    return std::make_shared<Font>(m_fonts.at(id));
-}
-
-void AssetsHandler::UnloadTextures()
-{
-    for (auto texture : m_textures)
-    {
-        UnloadTexture(texture.second);
-    }
-
-    m_textures.clear();
-}
-
-void AssetsHandler::UnloadFonts()
-{
-    for (auto font : m_fonts)
-    {
-        UnloadFont(font.second);
-    }
-
-    m_fonts.clear();
-}
 
 Drawable::Drawable(const IntVector2 dimensions, const IntVector2 margin)
     : m_dimensions(dimensions), m_margin(margin)

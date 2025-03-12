@@ -35,24 +35,58 @@ namespace Gameboard
         BOTTOM_RIGHT,
     };
 
+    template <typename T> class AssetHandler
+    {
+    protected:
+        std::map<std::string, T> m_assets;
+        T (*m_loadCallback)(const char* fileName); // Function pointer as different for each data type
+        void (*m_unloadCallback)(T); // Function pointer as different for each data type
+
+    public:
+        AssetHandler(T(*loadCallback)(const char* filePath), void (*unloadCallback)(T))
+            : m_loadCallback(loadCallback), m_unloadCallback(unloadCallback)
+        {
+        }
+
+        void LoadAssets(FilePathList assetsFilePaths)
+        {
+            for (int i = 0; i < assetsFilePaths.count; i++)
+            {
+                std::string currentFilePath = assetsFilePaths.paths[i];
+
+                if (IsPathFile(currentFilePath.c_str()))
+                {
+                    m_assets.insert({ GetFileNameWithoutExt(currentFilePath.c_str()), m_loadCallback(currentFilePath.c_str()) });
+                }
+            }
+        }
+        std::shared_ptr<T> GetAsset(std::string id)
+        {
+            return std::make_shared<T>(m_assets.at(id));
+        }
+
+        void UnloadAssets()
+        {
+            for (auto asset : m_assets)
+            {
+                m_unloadCallback(asset.second);
+            }
+
+            m_assets.clear();
+        } 
+
+    };
     
     class AssetsHandler
     {
-    private:
-        std::map<std::string, Texture2D> m_textures;
-        std::map<std::string, Font> m_fonts;
+    public:
+     
+        AssetHandler<Texture2D> texturesHandler = AssetHandler<Texture2D>(LoadTexture, UnloadTexture);
+        AssetHandler<Font> fontsHandler = AssetHandler<Font>(LoadFont, UnloadFont);
+        AssetHandler<Sound> soundsHandler = AssetHandler<Sound>(LoadSound, UnloadSound);
 
     public:
         AssetsHandler();
-
-        void LoadTextures(FilePathList textureFilePaths);
-        void LoadFonts(FilePathList fontFilePaths);
-
-        std::shared_ptr<Texture2D> GetTexture(std::string id);
-        std::shared_ptr<Font> GetFont(std::string id);
-
-        void UnloadTextures();
-        void UnloadFonts();
     };
 
     class Drawable
