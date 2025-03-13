@@ -7,8 +7,6 @@ bool IntVector2::operator==(const IntVector2& other) const
     return x == other.x && y == other.y;
 }
 
-Font Gameboard::defaultFont = GetFontDefault();
-std::shared_ptr<Font> Gameboard::defaultFont_ptr = std::make_shared<Font>(Gameboard::defaultFont);
 
 AssetsHandler::AssetsHandler() = default;
 
@@ -221,5 +219,5 @@ void Text::SetColour(const Color colour)
 void Text::Render() const
 {
     IntVector2 positionOnScreen = GetPositionOnScreen();
-    DrawTextEx(*m_font, m_text.c_str(), { (float)positionOnScreen.x, (float)positionOnScreen.y }, m_fontSize, 0, m_colour);
+    DrawTextEx(*m_font, m_text.c_str(), { (float)positionOnScreen.x, (float)positionOnScreen.y }, m_fontSize, 1, m_colour);
 }

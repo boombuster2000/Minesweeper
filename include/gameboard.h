@@ -17,9 +17,6 @@ struct IntVector2
 namespace Gameboard
 {
 
-    extern Font defaultFont;
-    extern std::shared_ptr<Font> defaultFont_ptr;
-
     enum AnchorPoints
     {
         TOP_LEFT,
@@ -138,6 +135,7 @@ namespace Gameboard
     class Text : public Drawable
     {
     private:
+
         std::string m_text;
         int m_fontSize;
         std::shared_ptr<Font> m_font;
@@ -145,7 +143,7 @@ namespace Gameboard
         AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
     public:
-        Text(std::string text, int fontSize, Color colour, std::shared_ptr<Font> font = defaultFont_ptr);
+        Text(std::string text, int fontSize, Color colour, std::shared_ptr<Font> font = std::make_shared<Font>(GetFontDefault()));
 
         std::string GetText() const;
         void SetText(const std::string text);
