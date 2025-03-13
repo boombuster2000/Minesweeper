@@ -5,10 +5,12 @@
 int main()
 {
 	InitWindow(800, 600, "Minesweeper");
+	InitAudioDevice(); 
 	SetTargetFPS(60);
 
 	Minesweeper::assetsHandler.texturesHandler.LoadAssets(LoadDirectoryFiles("./assets/textures"));
 	Minesweeper::assetsHandler.fontsHandler.LoadAssets(LoadDirectoryFiles("./assets/fonts"));
+	Minesweeper::assetsHandler.soundsHandler.LoadAssets(LoadDirectoryFiles("./assets/sounds"));
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 

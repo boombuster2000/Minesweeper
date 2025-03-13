@@ -58,7 +58,7 @@ namespace Minesweeper
 
         void Render() const override;
     };
-
+    
     class MinesweeperGrid : public Gameboard::Grid<Tile>
     {
     private:

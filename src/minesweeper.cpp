@@ -103,6 +103,7 @@ void Tile::Render() const
     }
 }
 
+
 MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position)
     : Grid(dimensions, sampleTile, anchorPoint, position)
 {
@@ -217,6 +218,7 @@ void MinesweeperGrid::HandleLeftClick(Tile& tile)
         break;
     case Tile::ContentOption::BOMB:
         m_isBombTriggered = true;
+        PlaySound(*assetsHandler.soundsHandler.GetAsset("explosion"));
         break;
     default:
         break;
