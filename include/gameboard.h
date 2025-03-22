@@ -57,7 +57,7 @@ namespace Gameboard
                 }
             }
         }
-        std::shared_ptr<T> GetAsset(std::string id)
+        std::shared_ptr<T> Get(std::string id)
         {
             return std::make_shared<T>(m_assets.at(id));
         }
@@ -78,9 +78,9 @@ namespace Gameboard
     {
     public:
      
-        AssetHandler<Texture2D> texturesHandler = AssetHandler<Texture2D>(LoadTexture, UnloadTexture);
-        AssetHandler<Font> fontsHandler = AssetHandler<Font>(LoadFont, UnloadFont);
-        AssetHandler<Sound> soundsHandler = AssetHandler<Sound>(LoadSound, UnloadSound);
+        AssetHandler<Texture2D> textures = AssetHandler<Texture2D>(LoadTexture, UnloadTexture);
+        AssetHandler<Font> fonts = AssetHandler<Font>(LoadFont, UnloadFont);
+        AssetHandler<Sound> sounds = AssetHandler<Sound>(LoadSound, UnloadSound);
 
     public:
         AssetsHandler();

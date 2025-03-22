@@ -8,22 +8,22 @@ int main()
 	InitAudioDevice(); 
 	SetTargetFPS(60);
 
-	Minesweeper::assetsHandler.texturesHandler.LoadAssets(LoadDirectoryFiles("./assets/textures"));
-	Minesweeper::assetsHandler.fontsHandler.LoadAssets(LoadDirectoryFiles("./assets/fonts"));
-	Minesweeper::assetsHandler.soundsHandler.LoadAssets(LoadDirectoryFiles("./assets/sounds"));
+	Minesweeper::assets.textures.LoadAssets(LoadDirectoryFiles("./assets/textures"));
+	Minesweeper::assets.fonts.LoadAssets(LoadDirectoryFiles("./assets/fonts"));
+	Minesweeper::assets.sounds.LoadAssets(LoadDirectoryFiles("./assets/sounds"));
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 
-	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
+	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	flagsLeft.SetPositionOnScreen(GetScreenWidth() - 170, 80);
 
-	Gameboard::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
+	Gameboard::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	winText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
+	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	loseText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assetsHandler.fontsHandler.GetAsset("arialroundedmtbold"));
+	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
 
 	bool shouldPlayAgain = true;
@@ -85,8 +85,8 @@ int main()
 		}
 	}
 
-	Minesweeper::assetsHandler.texturesHandler.UnloadAssets();
-	Minesweeper::assetsHandler.fontsHandler.UnloadAssets();
+	Minesweeper::assets.textures.UnloadAssets();
+	Minesweeper::assets.fonts.UnloadAssets();
 	CloseWindow();
 	return 0;
 }
