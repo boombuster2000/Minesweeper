@@ -190,16 +190,19 @@ void MinesweeperGrid::HandleRightClick(Tile& tile)
 {
     if (!tile.IsTileCovered()) return;
 
-    if (tile.IsTileFlagged())
+    if (tile.IsTileFlagged()) // Flag Remove
     {
         if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft += 1;
         m_numberOfFlagsLeft += 1;
+        PlaySound(*assetsHandler.soundsHandler.GetAsset("flag-up"));
+
     }
-    else
+    else // Flag Add
     {
         if (m_numberOfFlagsLeft <= 0) return;
         if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft -= 1;
         m_numberOfFlagsLeft -= 1;
+        PlaySound(*assetsHandler.soundsHandler.GetAsset("flag-down"));
     }
 
     tile.ToggleFlag();
@@ -211,6 +214,7 @@ void MinesweeperGrid::HandleLeftClick(Tile& tile)
 
     tile.ToggleCovered();
     tile.SetTexture(tile.GetContentTexture());
+    PlaySound(*assetsHandler.soundsHandler.GetAsset("uncover"));
 
     switch (tile.GetContentOption()) {
     case Tile::ContentOption::EMPTY:
