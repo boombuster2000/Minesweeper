@@ -44,8 +44,13 @@ namespace Gameboard
             : m_loadCallback(loadCallback), m_unloadCallback(unloadCallback)
         {
         }
+        ~AssetHandler()
+        {
+            UnloadAll();
+        }
 
-        void LoadAssets(FilePathList assetsFilePaths)
+
+        void LoadAll(FilePathList assetsFilePaths)
         {
             for (int i = 0; i < assetsFilePaths.count; i++)
             {
@@ -62,7 +67,7 @@ namespace Gameboard
             return std::make_shared<T>(m_assets.at(id));
         }
 
-        void UnloadAssets()
+        void UnloadAll()
         {
             for (auto asset : m_assets)
             {
@@ -84,6 +89,12 @@ namespace Gameboard
 
     public:
         AssetsHandler();
+        ~AssetsHandler()
+        {
+            textures.UnloadAll();
+            fonts.UnloadAll();
+            sounds.UnloadAll();
+        }
     };
 
     class Drawable

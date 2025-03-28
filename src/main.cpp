@@ -8,12 +8,12 @@ int main()
 	InitAudioDevice(); 
 	SetTargetFPS(60);
 
-	Minesweeper::assets.textures.LoadAssets(LoadDirectoryFiles("./assets/textures"));
-	Minesweeper::assets.fonts.LoadAssets(LoadDirectoryFiles("./assets/fonts"));
-	Minesweeper::assets.sounds.LoadAssets(LoadDirectoryFiles("./assets/sounds"));
+	//Loading assets
+	Minesweeper::assets.textures.LoadAll(LoadDirectoryFiles("./assets/textures"));
+	Minesweeper::assets.fonts.LoadAll(LoadDirectoryFiles("./assets/fonts"));
+	Minesweeper::assets.sounds.LoadAll(LoadDirectoryFiles("./assets/sounds"));
 
-	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
-
+	// Creating Text Instances
 	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	flagsLeft.SetPositionOnScreen(GetScreenWidth() - 170, 80);
 
@@ -26,6 +26,7 @@ int main()
 	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
 
+	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
 	bool shouldPlayAgain = true;
 
 	while (!WindowShouldClose() || shouldPlayAgain)
@@ -34,7 +35,7 @@ int main()
 			IntVector2{ 9,9 },
 			sampleTile,
 			Gameboard::AnchorPoints::MIDDLE,
-			IntVector2{ GetScreenWidth() / 2,GetScreenHeight() / 2 }
+			IntVector2{ GetScreenWidth() / 2, GetScreenHeight() / 2 }
 		);
 
 		// MAIN GAME LOOP
@@ -84,9 +85,8 @@ int main()
 			EndDrawing();
 		}
 	}
-
-	Minesweeper::assets.textures.UnloadAssets();
-	Minesweeper::assets.fonts.UnloadAssets();
+	
+	CloseAudioDevice();
 	CloseWindow();
 	return 0;
 }
