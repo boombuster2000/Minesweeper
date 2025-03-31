@@ -1,31 +1,10 @@
 #include "minesweeper.h"
 using namespace Minesweeper;
 
-const std::string Minesweeper::texturesBaseFilePath = "./resources/textures/";
-
-const std::map<std::string, std::string> Minesweeper::textureFilePaths =
-{
-    {"bomb", texturesBaseFilePath + "bomb.png"},
-    {"covered-tile", texturesBaseFilePath + "covered-tile.png"},
-    {"empty-tile", texturesBaseFilePath + "empty-tile.png"},
-    {"flag", texturesBaseFilePath + "flag.png"},
-    {"incorect", texturesBaseFilePath + "incorrect.png"},
-    {"one", texturesBaseFilePath + "one.png"},
-    {"two", texturesBaseFilePath + "two.png"},
-    {"three", texturesBaseFilePath + "three.png"},
-    {"four", texturesBaseFilePath + "four.png"},
-    {"five", texturesBaseFilePath + "five.png"},
-    {"six", texturesBaseFilePath + "six.png"},
-    {"seven", texturesBaseFilePath + "seven.png"},
-    {"eight", texturesBaseFilePath + "eight.png"},
-
-};
-
-Gameboard::TexturesHandler Minesweeper::texturesHandler (textureFilePaths);
-
+Gameboard::AssetsHandler Minesweeper::assets;
 
 Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
-    : DrawableTexture(texturesHandler.GetTexture("covered-tile"), dimensions, margin)
+    : DrawableTexture(assets.textures.Get("covered-tile"), dimensions, margin)
 {
 }
 
@@ -41,39 +20,39 @@ void Tile::SetContentOption(ContentOption contentOption)
     switch (m_entityOption)
     {
     case ContentOption::BOMB:
-        SetContentTexture(texturesHandler.GetTexture("bomb"));
+        SetContentTexture(assets.textures.Get("bomb"));
         break;
 
     case ContentOption::ONE:
-        SetContentTexture(texturesHandler.GetTexture("one"));
+        SetContentTexture(assets.textures.Get("one"));
         break;
 
     case ContentOption::TWO:
-        SetContentTexture(texturesHandler.GetTexture("two"));
+        SetContentTexture(assets.textures.Get("two"));
         break;
 
     case ContentOption::THREE:
-        SetContentTexture(texturesHandler.GetTexture("three"));
+        SetContentTexture(assets.textures.Get("three"));
         break;
 
     case ContentOption::FOUR:
-        SetContentTexture(texturesHandler.GetTexture("four"));
+        SetContentTexture(assets.textures.Get("four"));
         break;
 
     case ContentOption::FIVE:
-        SetContentTexture(texturesHandler.GetTexture("five"));
+        SetContentTexture(assets.textures.Get("five"));
         break;
 
     case ContentOption::SIX:
-        SetContentTexture(texturesHandler.GetTexture("six"));
+        SetContentTexture(assets.textures.Get("six"));
         break;
 
     case ContentOption::SEVEN:
-        SetContentTexture(texturesHandler.GetTexture("seven"));
+        SetContentTexture(assets.textures.Get("seven"));
         break;
 
     case ContentOption::EIGHT:
-        SetContentTexture(texturesHandler.GetTexture("eight"));
+        SetContentTexture(assets.textures.Get("eight"));
         break;
 
     default:
@@ -124,6 +103,7 @@ void Tile::Render() const
     }
 }
 
+
 MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position)
     : Grid(dimensions, sampleTile, anchorPoint, position)
 {
@@ -158,7 +138,7 @@ void MinesweeperGrid::PlaceBombsOnBoard()
 
     for (const auto& [x, y] : m_bombCoordinates) {
         m_grid[y][x].SetContentOption(Tile::ContentOption::BOMB);
-        m_grid[y][x].SetContentTexture(texturesHandler.GetTexture("bomb"));
+        m_grid[y][x].SetContentTexture(assets.textures.Get("bomb"));
     }
 
     // Simplified number assignment
@@ -210,16 +190,19 @@ void MinesweeperGrid::HandleRightClick(Tile& tile)
 {
     if (!tile.IsTileCovered()) return;
 
-    if (tile.IsTileFlagged())
+    if (tile.IsTileFlagged()) // Flag Remove
     {
         if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft += 1;
         m_numberOfFlagsLeft += 1;
+        PlaySound(*assets.sounds.Get("flag-up"));
+
     }
-    else
+    else // Flag Add
     {
         if (m_numberOfFlagsLeft <= 0) return;
         if (tile.GetContentOption() == Tile::ContentOption::BOMB) m_numberOfBombsLeft -= 1;
         m_numberOfFlagsLeft -= 1;
+        PlaySound(*assets.sounds.Get("flag-down"));
     }
 
     tile.ToggleFlag();
@@ -231,6 +214,7 @@ void MinesweeperGrid::HandleLeftClick(Tile& tile)
 
     tile.ToggleCovered();
     tile.SetTexture(tile.GetContentTexture());
+    PlaySound(*assets.sounds.Get("uncover"));
 
     switch (tile.GetContentOption()) {
     case Tile::ContentOption::EMPTY:
@@ -238,6 +222,7 @@ void MinesweeperGrid::HandleLeftClick(Tile& tile)
         break;
     case Tile::ContentOption::BOMB:
         m_isBombTriggered = true;
+        PlaySound(*assets.sounds.Get("explosion"));
         break;
     default:
         break;
@@ -302,7 +287,7 @@ void MinesweeperGrid::DisplayBombs()
             if (!tile.IsTileFlagged()) continue;
             if (tile.GetContentOption() == Tile::ContentOption::BOMB) continue;
 
-            m_grid[y][x].SetTexture(texturesHandler.GetTexture("incorrect"));
+            m_grid[y][x].SetTexture(assets.textures.Get("incorrect"));
             m_grid[y][x].ToggleFlag();
         }
     }

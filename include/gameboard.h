@@ -32,21 +32,69 @@ namespace Gameboard
         BOTTOM_RIGHT,
     };
 
-    class TexturesHandler
+    template <typename T> class AssetHandler
     {
-    private:
-        std::map<std::string, Texture2D> m_textures;
-        std::map<std::string, std::string> m_textureFilePaths;
+    protected:
+        std::map<std::string, T> m_assets;
+        T (*m_loadCallback)(const char* fileName); // Function pointer as different for each data type
+        void (*m_unloadCallback)(T); // Function pointer as different for each data type
 
     public:
-        TexturesHandler(const std::map<std::string, std::string>& textureFilePaths);
+        AssetHandler(T(*loadCallback)(const char* filePath), void (*unloadCallback)(T))
+            : m_loadCallback(loadCallback), m_unloadCallback(unloadCallback)
+        {
+        }
+        ~AssetHandler()
+        {
+            UnloadAll();
+        }
 
-        // Must be done after initialising window with raylib
-        void LoadTextures();
-        void UnloadTextures();
 
-        std::shared_ptr<Texture2D> GetTexture(const std::string textureID) const;
-        
+        void LoadAll(FilePathList assetsFilePaths)
+        {
+            for (int i = 0; i < assetsFilePaths.count; i++)
+            {
+                std::string currentFilePath = assetsFilePaths.paths[i];
+
+                if (IsPathFile(currentFilePath.c_str()))
+                {
+                    m_assets.insert({ GetFileNameWithoutExt(currentFilePath.c_str()), m_loadCallback(currentFilePath.c_str()) });
+                }
+            }
+        }
+        std::shared_ptr<T> Get(std::string id)
+        {
+            return std::make_shared<T>(m_assets.at(id));
+        }
+
+        void UnloadAll()
+        {
+            for (auto asset : m_assets)
+            {
+                m_unloadCallback(asset.second);
+            }
+
+            m_assets.clear();
+        } 
+
+    };
+    
+    class AssetsHandler
+    {
+    public:
+     
+        AssetHandler<Texture2D> textures = AssetHandler<Texture2D>(LoadTexture, UnloadTexture);
+        AssetHandler<Font> fonts = AssetHandler<Font>(LoadFont, UnloadFont);
+        AssetHandler<Sound> sounds = AssetHandler<Sound>(LoadSound, UnloadSound);
+
+    public:
+        AssetsHandler();
+        ~AssetsHandler()
+        {
+            textures.UnloadAll();
+            fonts.UnloadAll();
+            sounds.UnloadAll();
+        }
     };
 
     class Drawable
@@ -98,14 +146,15 @@ namespace Gameboard
     class Text : public Drawable
     {
     private:
+
         std::string m_text;
         int m_fontSize;
-        Font m_font = GetFontDefault();
+        std::shared_ptr<Font> m_font;
         Color m_colour;
         AnchorPoints m_anchorPoint = AnchorPoints::TOP_LEFT;
 
     public:
-        Text(std::string text, int fontSize, Color colour);
+        Text(std::string text, int fontSize, Color colour, std::shared_ptr<Font> font = std::make_shared<Font>(GetFontDefault()));
 
         std::string GetText() const;
         void SetText(const std::string text);
