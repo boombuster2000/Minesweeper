@@ -1,7 +1,7 @@
 #include "minesweeper.h"
 using namespace Minesweeper;
 
-Gameboard::AssetsHandler Minesweeper::assets;
+RaylibFramework::AssetsHandler Minesweeper::assets;
 
 Tile::Tile(const IntVector2 dimensions, const IntVector2 margin)
     : DrawableTexture(assets.textures.Get("covered-tile"), dimensions, margin)
@@ -104,7 +104,7 @@ void Tile::Render() const
 }
 
 
-MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position)
+MinesweeperGrid::MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const RaylibFramework::AnchorPoints anchorPoint, const IntVector2 position)
     : Grid(dimensions, sampleTile, anchorPoint, position)
 {
     m_numberOfBombs = static_cast<int>(dimensions.y * dimensions.x * m_bombDensity);

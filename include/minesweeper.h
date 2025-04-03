@@ -1,7 +1,7 @@
 #pragma once
 
 #include "raylib.h"
-#include "gameboard.h"
+#include "raylibFramework.h"
 #include <vector>
 #include <random>
 #include <set>
@@ -14,10 +14,10 @@ namespace Minesweeper
 
     extern const std::string texturesBaseFilePath;
     extern const std::map<std::string, std::string> textureFilePaths;
-    extern Gameboard::AssetsHandler assets;
+    extern RaylibFramework::AssetsHandler assets;
 
 
-    class Tile : public Gameboard::DrawableTexture
+    class Tile : public RaylibFramework::DrawableTexture
     {
     public:
         enum class ContentOption : int
@@ -59,7 +59,7 @@ namespace Minesweeper
         void Render() const override;
     };
     
-    class MinesweeperGrid : public Gameboard::Grid<Tile>
+    class MinesweeperGrid : public RaylibFramework::Grid<Tile>
     {
     private:
         typedef std::vector<std::vector<Tile>> TileGrid;
@@ -81,7 +81,7 @@ namespace Minesweeper
         void HandleLeftClick(Tile& tile);
 
     public:
-        MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const Gameboard::AnchorPoints anchorPoint, const IntVector2 position);
+        MinesweeperGrid(const IntVector2 dimensions, const Tile sampleTile, const RaylibFramework::AnchorPoints anchorPoint, const IntVector2 position);
 
         void ProcessMouseInput() override;
 

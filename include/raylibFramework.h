@@ -14,7 +14,7 @@ struct IntVector2
     bool operator==(const IntVector2& other) const;
 };
 
-namespace Gameboard
+namespace RaylibFramework
 {
 
     enum AnchorPoints
@@ -187,7 +187,7 @@ namespace Gameboard
     protected:
         T_Grid GenerateBoard(const IntVector2 dimensions, T_Entity sampleSquare)
         {
-            static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from Gameboard::Drawable");
+            static_assert(std::is_base_of<Drawable, T_Entity>::value, "T_Entity must derive from RaylibFramework::Drawable");
 
             if (dimensions.x <= 0 || dimensions.y <= 0) {
                 throw std::invalid_argument("Board dimensions must be positive");

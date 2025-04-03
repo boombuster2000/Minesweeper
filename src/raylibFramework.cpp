@@ -1,5 +1,5 @@
-#include "gameboard.h"
-using namespace Gameboard;
+#include "raylibFramework.h"
+using namespace RaylibFramework;
 
 
 bool IntVector2::operator==(const IntVector2& other) const
@@ -160,38 +160,38 @@ void Text::SetPositionOnScreen(int x, int y)
 
     switch (m_anchorPoint)
     {
-    case Gameboard::TOP_MIDDLE:
+    case RaylibFramework::TOP_MIDDLE:
         offset.x = width / 2;
         break;
 
-    case Gameboard::TOP_RIGHT:
+    case RaylibFramework::TOP_RIGHT:
         offset.x = width;
         break;
 
-    case Gameboard::MIDDLE_LEFT:
+    case RaylibFramework::MIDDLE_LEFT:
         offset.y = height / 2;
         break;
 
-    case Gameboard::MIDDLE:
+    case RaylibFramework::MIDDLE:
         offset.x = width / 2;
         offset.y = height / 2;
         break;
 
-    case Gameboard::MIDDLE_RIGHT:
+    case RaylibFramework::MIDDLE_RIGHT:
         offset.x = width;
         offset.y = height / 2;
         break;
 
-    case Gameboard::BOTTOM_LEFT:
+    case RaylibFramework::BOTTOM_LEFT:
         offset.y = height;
         break;
 
-    case Gameboard::BOTTOM_MIDDLE:
+    case RaylibFramework::BOTTOM_MIDDLE:
         offset.x = width / 2;
         offset.y = height;
         break;
 
-    case Gameboard::BOTTOM_RIGHT:
+    case RaylibFramework::BOTTOM_RIGHT:
         offset.x = width;
         offset.y = height;
         break;

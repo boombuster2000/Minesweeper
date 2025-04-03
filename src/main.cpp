@@ -14,16 +14,16 @@ int main()
 	Minesweeper::assets.sounds.LoadAll(LoadDirectoryFiles("./assets/sounds"));
 
 	// Creating Text Instances
-	Gameboard::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
+	RaylibFramework::Text flagsLeft("Flags Left: 0", 20, RED, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	flagsLeft.SetPositionOnScreen(GetScreenWidth() - 170, 80);
 
-	Gameboard::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
+	RaylibFramework::Text winText("You found all the bombs!", 50, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	winText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
+	RaylibFramework::Text loseText("You triggered a bomb!", 50, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	loseText.SetPositionOnScreen(10, 10);
 
-	Gameboard::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
+	RaylibFramework::Text playAgainText("Press ENTER to play again or ESC to exit", 30, BLUE, Minesweeper::assets.fonts.Get("arialroundedmtbold"));
 	playAgainText.SetPositionOnScreen(10, GetScreenHeight() - 50);
 
 	Minesweeper::Tile sampleTile(IntVector2{ 40,40 }, IntVector2{ 10,10 });
@@ -34,7 +34,7 @@ int main()
 		Minesweeper::MinesweeperGrid game(
 			IntVector2{ 9,9 },
 			sampleTile,
-			Gameboard::AnchorPoints::MIDDLE,
+			RaylibFramework::AnchorPoints::MIDDLE,
 			IntVector2{ GetScreenWidth() / 2, GetScreenHeight() / 2 }
 		);
 
